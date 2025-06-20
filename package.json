@@ -1,0 +1,15 @@
+{
+  "name": "copilot-usage-viewer",
+  "version": "1.0.0",
+  "description": "GitHub Copilot Usage Viewer",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "author": "",
+  "license": "ISC"
+}
