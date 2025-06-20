@@ -41,19 +41,40 @@
       border-radius: 8px;
       padding: 24px;
       margin-bottom: 24px;
-    }
-
-    .input-group {
+    }    .input-group {
       display: flex;
       gap: 12px;
+      position: relative;
+    }
+
+    .token-input-wrapper {
+      flex: 1;
+      position: relative;
     }
 
     #token {
-      flex: 1;
-      padding: 12px 16px;
+      width: 100%;
+      padding: 12px 40px 12px 16px;
       border: 1px solid #d0d7de;
       border-radius: 6px;
       font-size: 14px;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #656d76;
+      font-size: 14px;
+      padding: 4px;
+    }
+
+    .toggle-password:hover {
+      color: #24292f;
     }
 
     #token:focus {
@@ -76,9 +97,7 @@
 
     .btn:hover {
       background: #0550ae;
-    }
-
-    .btn:disabled {
+    }    .btn:disabled {
       background: #8c959f;
       cursor: not-allowed;
     }
@@ -265,18 +284,19 @@
   <div class="container">
     <div class="header">
       <h1 id="title">GitHub Copilot Usage Viewer</h1>
-    </div>
-
-    <div class="input-section">
+    </div>    <div class="input-section">
       <div class="input-group">
-        <input 
-          id="token" 
-          type="password" 
-          placeholder="Enter your GitHub Personal Access Token"
-        />
+        <div class="token-input-wrapper">
+          <input 
+            id="token" 
+            type="password" 
+            placeholder="Enter your GitHub Personal Access Token"
+          />
+          <button type="button" class="toggle-password" onclick="toggleTokenVisibility()">👁️</button>
+        </div>
         <button id="fetchBtn" class="btn" onclick="fetchUsage()">Fetch</button>
       </div>
-    </div>    <div id="result" class="result"></div>
+    </div><div id="result" class="result"></div>
 
     <div class="footer">
       <a href="https://github.com/uheej0625/copilot-usage-viewer" target="_blank">
@@ -284,17 +304,69 @@
       </a>
     </div>
   </div>
-
   <script>
     // Language detection and translations
     const lang = navigator.language.startsWith('ko') ? 'ko' : 'en';
+
+    // Simple encryption/decryption for token storage
+    function simpleEncrypt(text) {
+      const key = 'gh-copilot-viewer-2025'; // Simple key
+      let result = '';
+      for (let i = 0; i < text.length; i++) {
+        result += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+      }
+      return btoa(result); // Base64 encode
+    }
+
+    function simpleDecrypt(encrypted) {
+      try {
+        const decoded = atob(encrypted); // Base64 decode
+        const key = 'gh-copilot-viewer-2025';
+        let result = '';
+        for (let i = 0; i < decoded.length; i++) {
+          result += String.fromCharCode(decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+        }
+        return result;
+      } catch (e) {
+        return null; // Return null if decryption fails
+      }
+    }
+
+    function saveToken(token) {
+      if (token && token.trim()) {
+        const encrypted = simpleEncrypt(token);
+        localStorage.setItem('gh_ct', encrypted); // Use abbreviated key name
+      }
+    }
+
+    function loadToken() {
+      const encrypted = localStorage.getItem('gh_ct');
+      if (encrypted) {
+        return simpleDecrypt(encrypted);
+      }
+      return null;
+    }    function clearToken() {
+      localStorage.removeItem('gh_ct');
+    }
+
+    function toggleTokenVisibility() {
+      const tokenInput = document.getElementById('token');
+      const toggleBtn = document.querySelector('.toggle-password');
+      
+      if (tokenInput.type === 'password') {
+        tokenInput.type = 'text';
+        toggleBtn.textContent = '🙈';
+      } else {
+        tokenInput.type = 'password';
+        toggleBtn.textContent = '👁️';
+      }
+    }
     
     const translations = {
       ko: {
         title: 'GitHub Copilot 사용량 뷰어',
-        tokenPlaceholder: 'GitHub Personal Access Token을 입력하세요',
-        fetchBtn: '조회',
-        loading: '데이터를 불러오는 중...',        tokenError: 'GitHub Token을 입력해주세요.',
+        tokenPlaceholder: 'GitHub Personal Access Token을 입력하세요',        fetchBtn: '조회',
+        loading: '데이터를 불러오는 중...',tokenError: 'GitHub Token을 입력해주세요.',
         error: '오류가 발생했습니다',
         tokenNotFound: '유효하지 않은 토큰이거나 Copilot 정보를 찾을 수 없습니다.',
         unauthorized: '토큰이 유효하지 않거나 권한이 없습니다.',
@@ -322,9 +394,8 @@
       },
       en: {
         title: 'GitHub Copilot Usage Viewer',
-        tokenPlaceholder: 'Enter your GitHub Personal Access Token',
-        fetchBtn: 'Fetch',
-        loading: 'Loading data...',        tokenError: 'Please enter your GitHub Token.',
+        tokenPlaceholder: 'Enter your GitHub Personal Access Token',        fetchBtn: 'Fetch',
+        loading: 'Loading data...',tokenError: 'Please enter your GitHub Token.',
         error: 'An error occurred',
         tokenNotFound: 'Invalid token or Copilot information not found.',
         unauthorized: 'Token is invalid or unauthorized.',
@@ -352,12 +423,18 @@
       }
     };
 
-    const t = translations[lang];
-
-    // Initialize UI text
+    const t = translations[lang];    // Initialize UI text
     document.getElementById('title').textContent = t.title;
     document.getElementById('token').placeholder = t.tokenPlaceholder;
-    document.getElementById('fetchBtn').textContent = t.fetchBtn;
+    document.getElementById('fetchBtn').textContent = t.fetchBtn;    // Load saved token on page load and auto-fetch
+    window.addEventListener('DOMContentLoaded', function() {
+      const savedToken = loadToken();
+      if (savedToken) {
+        document.getElementById('token').value = savedToken;
+        // Auto-fetch data if token exists
+        fetchUsage();
+      }
+    });
 
     function getQuotaName(key) {
       const names = {
@@ -372,9 +449,7 @@
       if (!dateString) return 'N/A';
       const date = new Date(dateString);
       return lang === 'ko' ? date.toLocaleDateString('ko-KR') : date.toLocaleDateString('en-US');
-    }
-
-    async function fetchUsage() {
+    }    async function fetchUsage() {
       const token = document.getElementById('token').value.trim();
       const resultDiv = document.getElementById('result');
       const fetchBtn = document.getElementById('fetchBtn');
@@ -383,7 +458,8 @@
         resultDiv.innerHTML = `<div class="error">${t.tokenError}</div>`;
         resultDiv.style.display = 'block';
         return;
-      }
+      }      // Save token to localStorage (encrypted)
+      saveToken(token);
 
       // Show loading
       fetchBtn.disabled = true;
