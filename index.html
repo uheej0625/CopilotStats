@@ -90,7 +90,7 @@
                     <h3 class="text-lg font-semibold leading-none tracking-tight">
                         API 토큰 입력
                     </h3>
-                    <p class="text-sm text-gray-600 mt-1">GitHub Copilot API 토큰을 입력하세요</p>
+                    <p class="text-sm text-gray-600 mt-1">GitHub Copilot 토큰을 입력하세요</p>
                 </div>
                 <div class="px-6 pb-6 space-y-4">
                     <div class="flex gap-2">
@@ -271,6 +271,24 @@
                     <p class="text-gray-500">
                         할당량 정보를 확인하려면 위에서 API 토큰을 입력하고 "데이터 가져오기" 버튼을 클릭하세요.
                     </p>
+                </div>
+            </div>
+
+            <!-- 리뉴얼 전 페이지로 보기 카드 -->
+            <div class="bg-white rounded-lg border shadow-sm">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold leading-none tracking-tight mb-2">
+                        이전 버전 페이지
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        리뉴얼 이전의 레거시 디자인으로 돌아가서 사용량을 확인해보세요
+                    </p>
+                    <button
+                        onclick="window.location.href='/legacy'"
+                        class="w-full sm:w-auto px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors duration-200"
+                    >
+                        리뉴얼 전 페이지로 보기
+                    </button>
                 </div>
             </div>
         </div>
