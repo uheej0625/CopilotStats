@@ -1,10 +1,20 @@
 {
-  "devDependencies": {
-    "@types/react": "^19.1.9"
+  "name": "copilotstats",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "echo \"No development server configured\"",
+    "build": "echo \"No production build configured\"",
+    "test": "node --test"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-switch": "^1.2.5",
-    "lucide-react": "^0.539.0"
+    "lucide-react": "^0.539.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.9"
   }
 }
