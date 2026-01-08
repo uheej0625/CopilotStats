@@ -63,6 +63,37 @@ app.post("/api/github/access-token", async (req, res) => {
   }
 });
 
+app.get("/api/copilot/models", async (req, res) => {
+  try {
+    const token = req.headers.authorization;
+
+    if (!token) {
+      return res.status(401).json({ error: "토큰이 필요합니다." });
+    }
+
+    const response = await fetch("https://api.githubcopilot.com/models", {
+      method: "GET",
+      headers: {
+        Authorization: token,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return res.status(response.status).json({
+        error: `API 호출 실패: ${response.status} ${response.statusText}`,
+        details: errorText,
+      });
+    }
+
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Root route - serve index.html
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../public/index.html"));

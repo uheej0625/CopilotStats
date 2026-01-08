@@ -143,8 +143,9 @@ function createQuotaElement(quota) {
 
     const overageSpan = document.createElement("span");
     overageSpan.className = "hidden sm:inline";
-    overageSpan.textContent = `초과 허용: ${quota.overage_permitted ? "예" : "아니오"
-      }`;
+    overageSpan.textContent = `초과 허용: ${
+      quota.overage_permitted ? "예" : "아니오"
+    }`;
     usageDiv.appendChild(overageSpan);
   }
 
@@ -168,10 +169,12 @@ export function displayData(data) {
     document.getElementById(
       "premium-percent"
     ).textContent = `${premium.percent_remaining.toFixed(1)}% 남음`;
-    document.getElementById("premium-usage").textContent = `사용량: ${premium.entitlement - premium.remaining
-      }`;
-    document.getElementById("premium-overage").textContent = `초과 허용: ${premium.overage_permitted ? "예" : "아니오"
-      }`;
+    document.getElementById("premium-usage").textContent = `사용량: ${
+      premium.entitlement - premium.remaining
+    }`;
+    document.getElementById("premium-overage").textContent = `초과 허용: ${
+      premium.overage_permitted ? "예" : "아니오"
+    }`;
     document.getElementById(
       "premium-progress"
     ).style.width = `${premium.percent_remaining}%`;
@@ -206,15 +209,17 @@ export function displayData(data) {
 
   const chatStatus = document.getElementById("chat-status");
   chatStatus.textContent = data.chat_enabled ? "활성화" : "비활성화";
-  chatStatus.className = `text-xs px-2 py-1 rounded-md ${data.chat_enabled ? "bg-blue-100 text-blue-800" : "bg-red-100 text-red-800"
-    }`;
+  chatStatus.className = `text-xs px-2 py-1 rounded-md ${
+    data.chat_enabled ? "bg-blue-100 text-blue-800" : "bg-red-100 text-red-800"
+  }`;
 
   const signupStatus = document.getElementById("signup-status");
   signupStatus.textContent = data.can_signup_for_limited ? "가능" : "불가능";
-  signupStatus.className = `text-xs px-2 py-1 rounded-md ${data.can_signup_for_limited
-    ? "bg-blue-100 text-blue-800"
-    : "bg-gray-100 text-gray-800"
-    }`;
+  signupStatus.className = `text-xs px-2 py-1 rounded-md ${
+    data.can_signup_for_limited
+      ? "bg-blue-100 text-blue-800"
+      : "bg-gray-100 text-gray-800"
+  }`;
 
   // Analytics ID 표시
   document.getElementById("analytics-id").textContent =
@@ -251,4 +256,151 @@ export function showError(message) {
 export function hideError() {
   const errorAlert = document.getElementById("error-alert");
   errorAlert.classList.add("hidden");
+}
+// 모델 카드 생성
+function createModelCard(model) {
+  const card = document.createElement("div");
+  card.className =
+    "flex-shrink-0 w-80 bg-gradient-to-br from-gray-50 to-white rounded-lg border-2 shadow-sm hover:shadow-md transition-shadow";
+
+  // 카테고리별 색상 및 아이콘
+  const categoryStyles = {
+    lightweight: { color: "blue", icon: "⚡", label: "경량" },
+    versatile: { color: "purple", icon: "🎯", label: "범용" },
+    powerful: { color: "red", icon: "🚀", label: "강력" },
+  };
+
+  const category = model.model_picker_category
+    ? categoryStyles[model.model_picker_category]
+    : { color: "gray", icon: "🤖", label: "기타" };
+
+  const borderColor = `border-${category.color}-200`;
+  const bgColor = `bg-${category.color}-50`;
+  const textColor = `text-${category.color}-700`;
+  const badgeBg = `bg-${category.color}-100`;
+  const badgeText = `text-${category.color}-800`;
+
+  card.innerHTML = `
+    <div class="p-4 space-y-3">
+      <div class="flex items-start justify-between">
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-xl">${category.icon}</span>
+            <h4 class="font-bold text-gray-900 text-base">${model.name}</h4>
+          </div>
+          <code class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">${
+            model.id
+          }</code>
+        </div>
+        ${
+          model.model_picker_enabled
+            ? `<span class="flex-shrink-0 text-xs ${badgeBg} ${badgeText} px-2 py-1 rounded-md font-medium">${category.label}</span>`
+            : '<span class="flex-shrink-0 text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md">비활성</span>'
+        }
+      </div>
+
+      <div class="space-y-2 text-xs">
+        <div class="flex items-center justify-between py-1 border-b border-gray-100">
+          <span class="text-gray-600">제공사</span>
+          <span class="font-medium text-gray-900">${model.vendor}</span>
+        </div>
+        ${
+          model.capabilities
+            ? `
+          <div class="flex items-center justify-between py-1 border-b border-gray-100">
+            <span class="text-gray-600">타입</span>
+            <span class="font-medium text-gray-900">${
+              model.capabilities.type || "N/A"
+            }</span>
+          </div>
+          ${
+            model.capabilities.limits?.max_context_window_tokens
+              ? `
+            <div class="flex items-center justify-between py-1 border-b border-gray-100">
+              <span class="text-gray-600">컨텍스트</span>
+              <span class="font-medium text-gray-900">${(
+                model.capabilities.limits.max_context_window_tokens / 1000
+              ).toFixed(0)}K</span>
+            </div>
+            `
+              : ""
+          }
+          ${
+            model.capabilities.limits?.max_output_tokens
+              ? `
+            <div class="flex items-center justify-between py-1 border-b border-gray-100">
+              <span class="text-gray-600">최대 출력</span>
+              <span class="font-medium text-gray-900">${(
+                model.capabilities.limits.max_output_tokens / 1000
+              ).toFixed(0)}K</span>
+            </div>
+            `
+              : ""
+          }
+          `
+            : ""
+        }
+      </div>
+
+      ${
+        model.capabilities?.supports
+          ? `
+        <div class="flex flex-wrap gap-1 pt-2">
+          ${
+            model.capabilities.supports.vision
+              ? '<span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">👁️ Vision</span>'
+              : ""
+          }
+          ${
+            model.capabilities.supports.streaming
+              ? '<span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">📡 Streaming</span>'
+              : ""
+          }
+          ${
+            model.capabilities.supports.tool_calls
+              ? '<span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded">🛠️ Tools</span>'
+              : ""
+          }
+          ${
+            model.capabilities.supports.structured_outputs
+              ? '<span class="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded">📋 Structured</span>'
+              : ""
+          }
+        </div>
+        `
+          : ""
+      }
+    </div>
+  `;
+
+  return card;
+}
+
+// 모델 목록 표시
+export function displayModels(modelsData) {
+  const modelsGrid = document.getElementById("models-grid");
+  if (!modelsGrid || !modelsData?.data) return;
+
+  modelsGrid.replaceChildren();
+
+  // model_picker_enabled가 true인 모델만 필터링하고 카테고리별로 정렬
+  const enabledModels = modelsData.data
+    .filter((model) => model.model_picker_enabled)
+    .sort((a, b) => {
+      const categoryOrder = { powerful: 0, versatile: 1, lightweight: 2 };
+      const orderA = categoryOrder[a.model_picker_category] ?? 999;
+      const orderB = categoryOrder[b.model_picker_category] ?? 999;
+      return orderA - orderB;
+    });
+
+  if (enabledModels.length === 0) {
+    modelsGrid.innerHTML =
+      '<p class="text-sm text-gray-500 py-4">사용 가능한 모델이 없습니다.</p>';
+    return;
+  }
+
+  enabledModels.forEach((model) => {
+    const card = createModelCard(model);
+    modelsGrid.appendChild(card);
+  });
 }

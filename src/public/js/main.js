@@ -1,9 +1,15 @@
 // main.js - 메인 로직 및 이벤트 처리
 
 import { TokenStorage } from "./storage.js";
-import { displayData, setLoading, showError, hideError } from "./ui.js";
+import {
+  displayData,
+  displayModels,
+  setLoading,
+  showError,
+  hideError,
+} from "./ui.js";
 import { TokenGenerator } from "./token-generator.js";
-import { fetchCopilotData } from "./api.js";
+import { fetchCopilotData, fetchCopilotModels } from "./api.js";
 
 // 전역 변수
 let apiData = null;
@@ -97,6 +103,16 @@ async function fetchApiDataWithToken(token) {
     const data = await fetchCopilotData(token);
     apiData = data;
     displayData(data);
+
+    // 모델 목록도 함께 가져오기
+    try {
+      const modelsData = await fetchCopilotModels(token);
+      displayModels(modelsData);
+    } catch (modelError) {
+      console.error("모델 정보 가져오기 실패:", modelError);
+      // 모델 정보 실패해도 메인 데이터는 표시
+    }
+
     setLoading(false);
   } catch (err) {
     console.error("API 호출 에러:", err);

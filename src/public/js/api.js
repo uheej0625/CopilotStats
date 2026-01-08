@@ -1,16 +1,11 @@
-// api.js - API 호출 함수들
+// api.js - GitHub Copilot API 호출
 
-/**
- * GitHub Copilot 사용자 데이터를 가져옵니다
- * @param {string} token - GitHub API 토큰
- * @returns {Promise<Object>} - Copilot 사용자 데이터
- */
 export async function fetchCopilotData(token) {
   if (!token.trim()) {
     throw new Error("토큰을 입력해주세요.");
   }
 
-  const response = await fetch("/api/github/user", {
+  const response = await fetch("https://api.github.com/copilot_internal/user", {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -30,21 +25,15 @@ export async function fetchCopilotData(token) {
     }
   }
 
-  const responseData = await response.json();
-  return responseData;
+  return await response.json();
 }
 
-/**
- * GitHub Copilot 모델 데이터를 가져옵니다
- * @param {string} token - GitHub API 토큰
- * @returns {Promise<Object>} - Copilot 모델 데이터
- */
 export async function fetchCopilotModels(token) {
   if (!token.trim()) {
     throw new Error("토큰을 입력해주세요.");
   }
 
-  const response = await fetch("/api/github/models", {
+  const response = await fetch("/api/copilot/models", {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -64,7 +53,5 @@ export async function fetchCopilotModels(token) {
     }
   }
 
-  const responseData = await response.json();
-  return responseData;
+  return await response.json();
 }
-
