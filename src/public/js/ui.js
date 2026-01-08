@@ -300,18 +300,22 @@ function copyPremiumCardHTML(premium) {
   </div>
 </div>`;
 
-  navigator.clipboard.writeText(html).then(() => {
-    showSuccessMessage("HTML이 복사되었습니다.");
-  }).catch((err) => {
-    console.error("복사 실패:", err);
-    showError("복사에 실패했습니다.");
-  });
+  navigator.clipboard
+    .writeText(html)
+    .then(() => {
+      showSuccessMessage("HTML이 복사되었습니다.");
+    })
+    .catch((err) => {
+      console.error("복사 실패:", err);
+      showError("복사에 실패했습니다.");
+    });
 }
 
 // 성공 메시지 표시
 function showSuccessMessage(message) {
   const toast = document.createElement("div");
-  toast.className = "fixed top-4 right-4 z-50 bg-green-50 border border-green-200 rounded-md p-4 shadow-lg";
+  toast.className =
+    "fixed top-4 right-4 z-50 bg-green-50 border border-green-200 rounded-md p-4 shadow-lg";
   toast.innerHTML = `
     <div class="flex items-center">
       <svg class="h-5 w-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
