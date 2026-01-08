@@ -301,27 +301,37 @@
 
           <div class="bg-white rounded-lg border shadow-sm">
             <div class="p-6 pb-4">
-              <h3
-                class="text-lg font-semibold leading-none tracking-tight flex items-center gap-2"
-              >
-                <svg
-                  class="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3
+                    class="text-lg font-semibold leading-none tracking-tight flex items-center gap-2"
+                  >
+                    <svg
+                      class="h-5 w-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      ></path>
+                    </svg>
+                    사용 가능한 AI 모델
+                  </h3>
+                  <p class="text-sm text-gray-600 mt-1">
+                    현재 계정에서 사용할 수 있는 모델 목록
+                  </p>
+                </div>
+                <button
+                  id="fetch-models-button"
+                  class="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  ></path>
-                </svg>
-                사용 가능한 AI 모델
-              </h3>
-              <p class="text-sm text-gray-600 mt-1">
-                현재 계정에서 사용할 수 있는 모델 목록
-              </p>
+                  모델 불러오기
+                </button>
+              </div>
             </div>
             <div class="px-6 pb-6">
               <div id="models-container" class="overflow-x-auto -mx-2 px-2">

@@ -24,6 +24,7 @@ const toggleTokenVisibility = document.getElementById(
 );
 const eyeIcon = document.getElementById("eye-icon");
 const eyeOffIcon = document.getElementById("eye-off-icon");
+const fetchModelsButton = document.getElementById("fetch-models-button");
 
 // 페이지 로드 시 초기화
 document.addEventListener("DOMContentLoaded", function () {
@@ -36,6 +37,7 @@ function setupEventListeners() {
   fetchButton.addEventListener("click", fetchApiData);
   generateTokenButton.addEventListener("click", generateToken);
   toggleTokenVisibility.addEventListener("click", togglePasswordVisibility);
+  fetchModelsButton?.addEventListener("click", fetchModels);
   tokenInput.addEventListener("keypress", function (e) {
     if (e.key === "Enter") {
       fetchApiData();
@@ -94,6 +96,37 @@ function fetchApiData() {
   fetchApiDataWithToken(tokenInput.value);
 }
 
+// 모델 목록 가져오기
+async function fetchModels() {
+  const token = tokenInput.value;
+  if (!token.trim()) {
+    showError("토큰을 먼저 입력해주세요.");
+    return;
+  }
+
+  const button = fetchModelsButton;
+  const originalText = button.innerHTML;
+  
+  try {
+    button.disabled = true;
+    button.innerHTML = '<svg class="h-5 w-5 animate-spin inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 불러오는 중...';
+    
+    const modelsData = await fetchCopilotModels(token);
+    displayModels(modelsData);
+    
+    button.innerHTML = '✓ 불러오기 완료';
+    setTimeout(() => {
+      button.innerHTML = originalText;
+      button.disabled = false;
+    }, 2000);
+  } catch (error) {
+    console.error("모델 정보 가져오기 실패:", error);
+    showError(error.message || "모델 정보를 가져오는데 실패했습니다.");
+    button.innerHTML = originalText;
+    button.disabled = false;
+  }
+}
+
 // 토큰으로 API 데이터 가져오기
 async function fetchApiDataWithToken(token) {
   setLoading(true);
@@ -103,16 +136,6 @@ async function fetchApiDataWithToken(token) {
     const data = await fetchCopilotData(token);
     apiData = data;
     displayData(data);
-
-    // 모델 목록도 함께 가져오기
-    try {
-      const modelsData = await fetchCopilotModels(token);
-      displayModels(modelsData);
-    } catch (modelError) {
-      console.error("모델 정보 가져오기 실패:", modelError);
-      // 모델 정보 실패해도 메인 데이터는 표시
-    }
-
     setLoading(false);
   } catch (err) {
     console.error("API 호출 에러:", err);

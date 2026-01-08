@@ -383,23 +383,32 @@ export function displayModels(modelsData) {
 
   modelsGrid.replaceChildren();
 
-  // model_picker_enabled가 true인 모델만 필터링하고 카테고리별로 정렬
-  const enabledModels = modelsData.data
-    .filter((model) => model.model_picker_enabled)
-    .sort((a, b) => {
-      const categoryOrder = { powerful: 0, versatile: 1, lightweight: 2 };
-      const orderA = categoryOrder[a.model_picker_category] ?? 999;
-      const orderB = categoryOrder[b.model_picker_category] ?? 999;
-      return orderA - orderB;
-    });
+  // 모든 모델을 타입과 카테고리별로 정렬
+  const sortedModels = modelsData.data.sort((a, b) => {
+    // 1순위: chat 타입 우선
+    const typeA = a.capabilities?.type === 'chat' ? 0 : 1;
+    const typeB = b.capabilities?.type === 'chat' ? 0 : 1;
+    if (typeA !== typeB) return typeA - typeB;
 
-  if (enabledModels.length === 0) {
+    // 2순위: model_picker_enabled 우선
+    if (a.model_picker_enabled !== b.model_picker_enabled) {
+      return a.model_picker_enabled ? -1 : 1;
+    }
+
+    // 3순위: 카테고리별 정렬
+    const categoryOrder = { powerful: 0, versatile: 1, lightweight: 2 };
+    const orderA = categoryOrder[a.model_picker_category] ?? 999;
+    const orderB = categoryOrder[b.model_picker_category] ?? 999;
+    return orderA - orderB;
+  });
+
+  if (sortedModels.length === 0) {
     modelsGrid.innerHTML =
       '<p class="text-sm text-gray-500 py-4">사용 가능한 모델이 없습니다.</p>';
     return;
   }
 
-  enabledModels.forEach((model) => {
+  sortedModels.forEach((model) => {
     const card = createModelCard(model);
     modelsGrid.appendChild(card);
   });
