@@ -178,6 +178,12 @@ export function displayData(data) {
     document.getElementById(
       "premium-progress"
     ).style.width = `${premium.percent_remaining}%`;
+
+    // 공유 버튼 이벤트 리스너 설정
+    const shareButton = document.getElementById("share-premium-button");
+    if (shareButton) {
+      shareButton.onclick = () => copyPremiumCardHTML(premium);
+    }
   }
 
   // 기타 할당량 표시
@@ -257,6 +263,75 @@ export function hideError() {
   const errorAlert = document.getElementById("error-alert");
   errorAlert.classList.add("hidden");
 }
+
+// Premium Interactions 카드 HTML 복사
+function copyPremiumCardHTML(premium) {
+  const remaining = premium.remaining;
+  const entitlement = premium.entitlement;
+  const percentRemaining = premium.percent_remaining.toFixed(1);
+  const usage = entitlement - remaining;
+  const overage = premium.overage_permitted ? "예" : "아니오";
+
+  const html = `<div style="max-width: 800px; margin: 1em auto; padding: 2em; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; box-sizing: border-box; border-radius: 16px; background: linear-gradient(to right, #faf5ff, #eef2ff); border: 2px solid #e9d5ff; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);">
+  <div style="margin-bottom: 1.5em;">
+    <div style="display: flex; align-items: center; gap: 0.75em; margin-bottom: 0.5em;">
+      <svg style="width: 1.5em; height: 1.5em; color: #9333ea;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+      </svg>
+      <span style="font-size: 1.25em; font-weight: 600; color: #6b21a8;">Premium Interactions</span>
+      <span style="font-size: 0.875em; background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; padding: 0.25em 0.5em; border-radius: 0.375em;">핵심 할당량</span>
+    </div>
+    <p style="margin: 0; color: #4b5563; font-size: 1em;">프리미엄 모델을 위한 할당량</p>
+  </div>
+  <div style="margin-bottom: 1.5em;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1em;">
+      <div>
+        <div style="font-size: 1.875em; font-weight: 700; color: #7e22ce; margin-bottom: 0.25em;">${remaining} / ${entitlement}</div>
+        <div style="font-size: 1.125em; color: #9333ea;">${percentRemaining}% 남음</div>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 1.125em; font-weight: 500; color: #374151; margin-bottom: 0.5em;">사용량: ${usage}</div>
+        <div style="font-size: 0.875em; color: #6b7280;">초과 허용: ${overage}</div>
+      </div>
+    </div>
+    <div style="height: 1em; background: #e5e7eb; border-radius: 9999px; overflow: hidden;">
+      <div style="height: 100%; background: linear-gradient(to right, #a855f7, #7c3aed); width: ${percentRemaining}%; transition: width 0.3s ease;"></div>
+    </div>
+  </div>
+</div>`;
+
+  navigator.clipboard
+    .writeText(html)
+    .then(() => {
+      showSuccessMessage("HTML이 복사되었습니다.");
+    })
+    .catch((err) => {
+      console.error("복사 실패:", err);
+      showError("복사에 실패했습니다.");
+    });
+}
+
+// 성공 메시지 표시
+function showSuccessMessage(message) {
+  const toast = document.createElement("div");
+  toast.className =
+    "fixed top-4 right-4 z-50 bg-green-50 border border-green-200 rounded-md p-4 shadow-lg";
+  toast.innerHTML = `
+    <div class="flex items-center">
+      <svg class="h-5 w-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <p class="text-sm text-green-800">${message}</p>
+    </div>
+  `;
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
 // 모델 카드 생성
 function createModelCard(model) {
   const card = document.createElement("div");
