@@ -2,6 +2,7 @@
   "name": "copilot-usage-viewer",
   "version": "1.0.0",
   "description": "GitHub Copilot Usage Viewer",
+  "type": "module",
   "main": "src/server/index.js",
   "scripts": {
     "start": "node src/server/index.js",
