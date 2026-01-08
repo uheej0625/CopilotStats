@@ -3,6 +3,7 @@
 import { TokenStorage } from "./storage.js";
 import { displayData, setLoading, showError, hideError } from "./ui.js";
 import { TokenGenerator } from "./token-generator.js";
+import { fetchCopilotData } from "./api.js";
 
 // 전역 변수
 let apiData = null;
@@ -93,7 +94,7 @@ async function fetchApiDataWithToken(token) {
   hideError();
 
   try {
-    const data = await window.fetchCopilotData(token);
+    const data = await fetchCopilotData(token);
     apiData = data;
     displayData(data);
     setLoading(false);
