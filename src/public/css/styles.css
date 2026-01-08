@@ -4,11 +4,13 @@
     border-radius: 9999px;
     overflow: hidden;
 }
+
 .progress-fill {
     height: 100%;
     background: linear-gradient(to right, #a855f7, #7c3aed);
     transition: width 0.3s ease;
 }
+
 .progress-fill-default {
     background: linear-gradient(to right, #3b82f6, #1d4ed8);
 }
@@ -20,11 +22,13 @@
     width: 44px;
     height: 24px;
 }
+
 .switch input {
     opacity: 0;
     width: 0;
     height: 0;
 }
+
 .slider {
     position: absolute;
     cursor: pointer;
@@ -36,6 +40,7 @@
     transition: .4s;
     border-radius: 24px;
 }
+
 .slider:before {
     position: absolute;
     content: "";
@@ -47,10 +52,12 @@
     transition: .4s;
     border-radius: 50%;
 }
-input:checked + .slider {
+
+input:checked+.slider {
     background-color: #3b82f6;
 }
-input:checked + .slider:before {
+
+input:checked+.slider:before {
     transform: translateX(20px);
 }
 
@@ -58,9 +65,15 @@ input:checked + .slider:before {
 .animate-spin {
     animation: spin 1s linear infinite;
 }
+
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Hide/show elements */

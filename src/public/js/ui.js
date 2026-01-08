@@ -143,9 +143,8 @@ function createQuotaElement(quota) {
 
     const overageSpan = document.createElement("span");
     overageSpan.className = "hidden sm:inline";
-    overageSpan.textContent = `초과 허용: ${
-      quota.overage_permitted ? "예" : "아니오"
-    }`;
+    overageSpan.textContent = `초과 허용: ${quota.overage_permitted ? "예" : "아니오"
+      }`;
     usageDiv.appendChild(overageSpan);
   }
 
@@ -169,12 +168,10 @@ export function displayData(data) {
     document.getElementById(
       "premium-percent"
     ).textContent = `${premium.percent_remaining.toFixed(1)}% 남음`;
-    document.getElementById("premium-usage").textContent = `사용량: ${
-      premium.entitlement - premium.remaining
-    }`;
-    document.getElementById("premium-overage").textContent = `초과 허용: ${
-      premium.overage_permitted ? "예" : "아니오"
-    }`;
+    document.getElementById("premium-usage").textContent = `사용량: ${premium.entitlement - premium.remaining
+      }`;
+    document.getElementById("premium-overage").textContent = `초과 허용: ${premium.overage_permitted ? "예" : "아니오"
+      }`;
     document.getElementById(
       "premium-progress"
     ).style.width = `${premium.percent_remaining}%`;
@@ -209,17 +206,15 @@ export function displayData(data) {
 
   const chatStatus = document.getElementById("chat-status");
   chatStatus.textContent = data.chat_enabled ? "활성화" : "비활성화";
-  chatStatus.className = `text-xs px-2 py-1 rounded-md ${
-    data.chat_enabled ? "bg-blue-100 text-blue-800" : "bg-red-100 text-red-800"
-  }`;
+  chatStatus.className = `text-xs px-2 py-1 rounded-md ${data.chat_enabled ? "bg-blue-100 text-blue-800" : "bg-red-100 text-red-800"
+    }`;
 
   const signupStatus = document.getElementById("signup-status");
   signupStatus.textContent = data.can_signup_for_limited ? "가능" : "불가능";
-  signupStatus.className = `text-xs px-2 py-1 rounded-md ${
-    data.can_signup_for_limited
-      ? "bg-blue-100 text-blue-800"
-      : "bg-gray-100 text-gray-800"
-  }`;
+  signupStatus.className = `text-xs px-2 py-1 rounded-md ${data.can_signup_for_limited
+    ? "bg-blue-100 text-blue-800"
+    : "bg-gray-100 text-gray-800"
+    }`;
 
   // Analytics ID 표시
   document.getElementById("analytics-id").textContent =
