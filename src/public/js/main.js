@@ -1,6 +1,5 @@
 // main.js - 메인 로직 및 이벤트 처리
 
-import { fetchCopilotData } from "./api.js";
 import { TokenStorage } from "./storage.js";
 import { displayData, setLoading, showError, hideError } from "./ui.js";
 import { TokenGenerator } from "./token-generator.js";
@@ -94,7 +93,7 @@ async function fetchApiDataWithToken(token) {
   hideError();
 
   try {
-    const data = await fetchCopilotData(token);
+    const data = await window.fetchCopilotData(token);
     apiData = data;
     displayData(data);
     setLoading(false);
