@@ -1,0 +1,20 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/src/public/index.html"
+    },
+    {
+      "source": "/legacy",
+      "destination": "/src/public/legacy.html"
+    },
+    {
+      "source": "/css/:path*",
+      "destination": "/src/public/css/:path*"
+    },
+    {
+      "source": "/js/:path*",
+      "destination": "/src/public/js/:path*"
+    }
+  ]
+}
