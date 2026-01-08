@@ -93,7 +93,7 @@ async function fetchApiDataWithToken(token) {
   hideError();
 
   try {
-    const data = await fetchCopilotData(token);
+    const data = await window.fetchCopilotData(token);
     apiData = data;
     displayData(data);
     setLoading(false);

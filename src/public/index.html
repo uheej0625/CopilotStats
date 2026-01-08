@@ -453,7 +453,7 @@
       </div>
     </div>
 
-    <script>
+    <script type="module">
       // API 호출 함수
       async function fetchCopilotData(token) {
         if (!token.trim()) {
@@ -487,6 +487,9 @@
 
         return await response.json();
       }
+
+      // Export to window for module access
+      window.fetchCopilotData = fetchCopilotData;
     </script>
     <script type="module" src="/js/main.js"></script>
   </body>
