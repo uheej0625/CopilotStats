@@ -386,8 +386,8 @@ export function displayModels(modelsData) {
   // 모든 모델을 타입과 카테고리별로 정렬
   const sortedModels = modelsData.data.sort((a, b) => {
     // 1순위: chat 타입 우선
-    const typeA = a.capabilities?.type === 'chat' ? 0 : 1;
-    const typeB = b.capabilities?.type === 'chat' ? 0 : 1;
+    const typeA = a.capabilities?.type === "chat" ? 0 : 1;
+    const typeB = b.capabilities?.type === "chat" ? 0 : 1;
     if (typeA !== typeB) return typeA - typeB;
 
     // 2순위: model_picker_enabled 우선

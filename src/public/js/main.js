@@ -106,15 +106,16 @@ async function fetchModels() {
 
   const button = fetchModelsButton;
   const originalText = button.innerHTML;
-  
+
   try {
     button.disabled = true;
-    button.innerHTML = '<svg class="h-5 w-5 animate-spin inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 불러오는 중...';
-    
+    button.innerHTML =
+      '<svg class="h-5 w-5 animate-spin inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 불러오는 중...';
+
     const modelsData = await fetchCopilotModels(token);
     displayModels(modelsData);
-    
-    button.innerHTML = '✓ 불러오기 완료';
+
+    button.innerHTML = "✓ 불러오기 완료";
     setTimeout(() => {
       button.innerHTML = originalText;
       button.disabled = false;
