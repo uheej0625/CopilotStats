@@ -30,63 +30,96 @@
             </p>
           </div>
           <div class="px-6 pb-6 space-y-4">
-            <div class="flex gap-2">
-              <div class="relative flex-1">
-                <input
-                  type="password"
-                  id="token-input"
-                  placeholder="API 토큰을 입력하거나 생성하세요..."
-                  class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-                <button
-                  id="toggle-token-visibility"
-                  type="button"
-                  class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                  title="토큰 표시/숨기기"
-                >
-                  <svg
-                    id="eye-icon"
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+            <!-- 토큰 입력 그리드 -->
+            <div id="token-inputs-container" class="grid grid-cols-1 gap-3">
+              <!-- 기본 토큰 입력 -->
+              <div class="token-input-wrapper" data-index="0">
+                <div class="flex gap-2">
+                  <div class="relative flex-1">
+                    <input
+                      type="password"
+                      id="token-input"
+                      class="token-input w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="계정 #1 - API 토큰을 입력하거나 생성하세요..."
+                      data-index="0"
+                    />
+                    <button
+                      id="toggle-token-visibility"
+                      type="button"
+                      class="toggle-visibility absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                      title="토큰 표시/숨기기"
+                      data-index="0"
+                    >
+                      <svg
+                        id="eye-icon"
+                        class="h-5 w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        ></path>
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        ></path>
+                      </svg>
+                      <svg
+                        id="eye-off-icon"
+                        class="h-5 w-5 hidden"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                        ></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <button
+                    id="generate-token-button"
+                    class="generate-token-btn px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="GitHub OAuth로 자동 생성"
+                    data-index="0"
                   >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    ></path>
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                    ></path>
-                  </svg>
-                  <svg
-                    id="eye-off-icon"
-                    class="h-5 w-5 hidden"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-                    ></path>
-                  </svg>
-                </button>
+                    <svg
+                      class="h-5 w-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 4v16m8-8H4"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
               </div>
+
+              <!-- 추가 토큰 입력 슬롯 -->
+              <div id="additional-tokens-container"></div>
+            </div>
+
+            <div class="flex gap-2">
               <button
-                id="generate-token-button"
-                class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                title="GitHub OAuth로 자동 생성"
+                id="add-account-button"
+                class="px-4 py-2 text-sm bg-gray-100 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
               >
                 <svg
-                  class="h-5 w-5"
+                  class="h-4 w-4 inline mr-1"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -98,10 +131,11 @@
                     d="M12 4v16m8-8H4"
                   ></path>
                 </svg>
+                계정 추가
               </button>
               <button
                 id="fetch-button"
-                class="min-w-[120px] px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="flex-1 min-w-[120px] px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span id="button-text">데이터 가져오기</span>
                 <svg

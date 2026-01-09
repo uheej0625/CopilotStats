@@ -488,3 +488,239 @@ export function displayModels(modelsData) {
     modelsGrid.appendChild(card);
   });
 }
+
+// 다중 계정 데이터 표시
+export function displayMultipleAccountsData(accountDataArray) {
+  const noDataMessage = document.getElementById("no-data-message");
+  const dataContainer = document.getElementById("data-container");
+
+  noDataMessage.classList.add("hidden");
+  dataContainer.classList.remove("hidden");
+
+  // 모든 계정의 데이터를 표시
+  const premiumCard = document.getElementById("premium-interactions-card");
+
+  // 1개 계정인 경우 단순화된 표시
+  if (accountDataArray.length === 1) {
+    premiumCard.innerHTML = generateSingleAccountPremiumCard(
+      accountDataArray[0]
+    );
+
+    // 공유 버튼 이벤트 리스너 설정
+    const shareButton = document.getElementById("share-premium-button");
+    if (shareButton) {
+      const premium =
+        accountDataArray[0].data.quota_snapshots.premium_interactions;
+      shareButton.onclick = () => copyPremiumCardHTML(premium);
+    }
+  } else {
+    // 2개 이상인 경우 다중 계정 표시
+    premiumCard.innerHTML = generateMultiAccountPremiumCard(accountDataArray);
+  }
+
+  // 기타 할당량 표시 (첫 번째 계정 기준)
+  if (accountDataArray.length > 0) {
+    const firstAccountData = accountDataArray[0].data;
+    const otherQuotasContainer = document.getElementById("other-quotas");
+    otherQuotasContainer.replaceChildren();
+
+    Object.entries(firstAccountData.quota_snapshots)
+      .filter(([key]) => key !== "premium_interactions")
+      .forEach(([key, quota]) => {
+        const quotaElement = createQuotaElement(quota);
+        otherQuotasContainer.appendChild(quotaElement);
+      });
+
+    // 날짜 정보 표시 (첫 번째 계정 기준)
+    document.getElementById("assigned-date").textContent = formatDate(
+      firstAccountData.assigned_date
+    );
+    document.getElementById("reset-date").textContent = formatDate(
+      firstAccountData.quota_reset_date,
+      false
+    );
+
+    // 계정 정보 표시 (첫 번째 계정 기준)
+    document.getElementById("account-type").textContent =
+      firstAccountData.access_type_sku.replace("_", " ").toUpperCase();
+    document.getElementById("plan-type").textContent =
+      firstAccountData.copilot_plan.toUpperCase();
+
+    const chatStatus = document.getElementById("chat-status");
+    chatStatus.textContent = firstAccountData.chat_enabled
+      ? "활성화"
+      : "비활성화";
+    chatStatus.className = `text-xs px-2 py-1 rounded-md ${
+      firstAccountData.chat_enabled
+        ? "bg-blue-100 text-blue-800"
+        : "bg-red-100 text-red-800"
+    }`;
+
+    const signupStatus = document.getElementById("signup-status");
+    signupStatus.textContent = firstAccountData.can_signup_for_limited
+      ? "가능"
+      : "불가능";
+    signupStatus.className = `text-xs px-2 py-1 rounded-md ${
+      firstAccountData.can_signup_for_limited
+        ? "bg-blue-100 text-blue-800"
+        : "bg-gray-100 text-gray-800"
+    }`;
+
+    // Analytics ID 표시 (첫 번째 계정)
+    document.getElementById("analytics-id").textContent =
+      firstAccountData.analytics_tracking_id;
+  }
+}
+
+// 단일 계정 Premium 카드 생성
+function generateSingleAccountPremiumCard({ accountIndex, data }) {
+  const premium = data.quota_snapshots.premium_interactions;
+  if (!premium) return "";
+
+  const usage = premium.entitlement - premium.remaining;
+  const percentRemaining = premium.percent_remaining.toFixed(1);
+
+  return `
+    <div class="p-6 pb-4">
+      <div class="flex items-start justify-between">
+        <div class="flex-1">
+          <h3 class="text-xl font-semibold leading-none tracking-tight flex items-center gap-3">
+            <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            <span class="text-purple-800">Premium Interactions</span>
+            <span class="text-sm bg-purple-100 text-purple-700 border border-purple-300 px-2 py-1 rounded-md">핵심 할당량</span>
+          </h3>
+          <p class="text-base text-gray-600 mt-1">프리미엄 모델을 위한 할당량</p>
+        </div>
+        <button
+          id="share-premium-button"
+          class="ml-4 p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-100 rounded-md transition-colors"
+          title="HTML 복사"
+        >
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="px-6 pb-6">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <div id="premium-quota" class="text-3xl font-bold text-purple-800">${
+            premium.remaining
+          } / ${premium.entitlement}</div>
+          <div id="premium-percent" class="text-lg text-purple-600 mt-1">${percentRemaining}% 남음</div>
+        </div>
+        <div class="text-right">
+          <div id="premium-usage" class="text-lg font-semibold text-gray-700">사용량: ${usage}</div>
+          <div id="premium-overage" class="text-sm text-gray-600 mt-1">초과 허용: ${
+            premium.overage_permitted ? "예" : "아니오"
+          }</div>
+        </div>
+      </div>
+      <div class="progress-bar h-3">
+        <div id="premium-progress" class="progress-fill" style="width: ${percentRemaining}%"></div>
+      </div>
+    </div>
+  `;
+}
+
+// 다중 계정 Premium 카드 생성
+function generateMultiAccountPremiumCard(accountDataArray) {
+  let totalRemaining = 0;
+  let totalEntitlement = 0;
+  let accountsHtml = "";
+
+  accountDataArray.forEach(({ accountIndex, data }) => {
+    if (data.quota_snapshots.premium_interactions) {
+      const premium = data.quota_snapshots.premium_interactions;
+      totalRemaining += premium.remaining;
+      totalEntitlement += premium.entitlement;
+
+      const usage = premium.entitlement - premium.remaining;
+      const percentRemaining = premium.percent_remaining.toFixed(1);
+      const resetDate = formatDate(data.quota_reset_date, false);
+      const planType = data.copilot_plan.toUpperCase();
+
+      accountsHtml += `
+        <div class="bg-white bg-opacity-70 rounded-lg p-4 border border-purple-200 hover:border-purple-300 transition-colors">
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <h4 class="font-semibold text-purple-900 text-lg">계정 #${accountIndex}</h4>
+              <div class="flex gap-2 mt-1">
+                <span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-md">${planType}</span>
+                <span class="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded-md">${percentRemaining}% 남음</span>
+              </div>
+            </div>
+            <div class="text-right text-sm text-gray-600">
+              <div class="font-medium text-purple-800">리셋: ${resetDate}</div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <div class="text-2xl font-bold text-purple-800">${
+                premium.remaining
+              } <span class="text-lg text-gray-500">/ ${
+        premium.entitlement
+      }</span></div>
+            </div>
+            <div class="text-right text-sm">
+              <div class="text-gray-600">사용: <span class="font-semibold text-purple-700">${usage}</span></div>
+              <div class="text-gray-500 text-xs mt-1">초과: ${
+                premium.overage_permitted ? "가능" : "불가"
+              }</div>
+            </div>
+          </div>
+          <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-purple-500 to-indigo-600 transition-all duration-300" style="width: ${percentRemaining}%"></div>
+          </div>
+        </div>
+      `;
+    }
+  });
+
+  const totalPercentRemaining =
+    totalEntitlement > 0
+      ? ((totalRemaining / totalEntitlement) * 100).toFixed(1)
+      : 0;
+  const totalUsage = totalEntitlement - totalRemaining;
+
+  return `
+    <div class="p-6 pb-4">
+      <div class="flex items-start justify-between">
+        <div class="flex-1">
+          <h3 class="text-xl font-semibold leading-none tracking-tight flex items-center gap-3">
+            <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            <span class="text-purple-800">Premium Interactions</span>
+            <span class="text-sm bg-purple-100 text-purple-700 border border-purple-300 px-2 py-1 rounded-md">전체 ${accountDataArray.length}개 계정</span>
+          </h3>
+          <p class="text-base text-gray-600 mt-1">프리미엄 모델을 위한 할당량</p>
+        </div>
+      </div>
+    </div>
+    <div class="px-6 pb-6">
+      <div class="mb-4 p-5 bg-gradient-to-br from-purple-100 via-purple-50 to-indigo-100 rounded-lg border-2 border-purple-300 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <div class="text-sm text-purple-700 font-medium mb-1">🎯 전체 합계</div>
+            <div class="text-3xl font-bold text-purple-900">${totalRemaining} <span class="text-xl text-gray-600">/ ${totalEntitlement}</span></div>
+            <div class="text-lg text-purple-700 mt-1 font-semibold">${totalPercentRemaining}% 남음</div>
+          </div>
+          <div class="text-right">
+            <div class="text-sm font-medium text-gray-600">총 사용량</div>
+            <div class="text-3xl font-bold text-purple-800">${totalUsage}</div>
+          </div>
+        </div>
+        <div class="h-3 bg-white bg-opacity-60 rounded-full overflow-hidden shadow-inner">
+          <div class="h-full bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-600 transition-all duration-500" style="width: ${totalPercentRemaining}%"></div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        ${accountsHtml}
+      </div>
+    </div>
+  `;
+}
