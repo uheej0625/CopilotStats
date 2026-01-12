@@ -25,7 +25,14 @@ export async function fetchCopilotData(token) {
     }
   }
 
-  return await response.json();
+  const data = await response.json();
+
+  // 플랜이 없는 경우 플래그 추가 (에러를 던지지 않고 데이터 반환)
+  if (!data.quota_snapshots || !data.quota_snapshots.premium_interactions) {
+    data._noPlan = true; // 플랜 없음 플래그 추가
+  }
+
+  return data;
 }
 
 export async function fetchCopilotModels(token) {

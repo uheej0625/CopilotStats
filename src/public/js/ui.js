@@ -161,7 +161,7 @@ export function displayData(data) {
   dataContainer.classList.remove("hidden");
 
   // Premium Interactions 표시
-  if (data.quota_snapshots.premium_interactions) {
+  if (data.quota_snapshots && data.quota_snapshots.premium_interactions) {
     const premium = data.quota_snapshots.premium_interactions;
     document.getElementById(
       "premium-quota"
@@ -190,46 +190,66 @@ export function displayData(data) {
   const otherQuotasContainer = document.getElementById("other-quotas");
   otherQuotasContainer.replaceChildren();
 
-  Object.entries(data.quota_snapshots)
-    .filter(([key]) => key !== "premium_interactions")
-    .forEach(([key, quota]) => {
-      const quotaElement = createQuotaElement(quota);
-      otherQuotasContainer.appendChild(quotaElement);
-    });
+  if (data.quota_snapshots) {
+    Object.entries(data.quota_snapshots)
+      .filter(([key]) => key !== "premium_interactions")
+      .forEach(([key, quota]) => {
+        const quotaElement = createQuotaElement(quota);
+        otherQuotasContainer.appendChild(quotaElement);
+      });
+  }
 
   // 날짜 정보 표시
-  document.getElementById("assigned-date").textContent = formatDate(
-    data.assigned_date
-  );
-  document.getElementById("reset-date").textContent = formatDate(
-    data.quota_reset_date,
-    false
-  );
+  if (data.assigned_date) {
+    document.getElementById("assigned-date").textContent = formatDate(
+      data.assigned_date
+    );
+  }
+  if (data.quota_reset_date) {
+    document.getElementById("reset-date").textContent = formatDate(
+      data.quota_reset_date,
+      false
+    );
+  }
 
   // 계정 정보 표시
-  document.getElementById("account-type").textContent = data.access_type_sku
-    .replace("_", " ")
-    .toUpperCase();
-  document.getElementById("plan-type").textContent =
-    data.copilot_plan.toUpperCase();
+  if (data.access_type_sku) {
+    document.getElementById("account-type").textContent = data.access_type_sku
+      .replace("_", " ")
+      .toUpperCase();
+  }
+  if (data.copilot_plan) {
+    document.getElementById("plan-type").textContent =
+      data.copilot_plan.toUpperCase();
+  } else if (data._noPlan) {
+    document.getElementById("plan-type").textContent = "플랜 없음";
+  }
 
   const chatStatus = document.getElementById("chat-status");
-  chatStatus.textContent = data.chat_enabled ? "활성화" : "비활성화";
-  chatStatus.className = `text-xs px-2 py-1 rounded-md ${
-    data.chat_enabled ? "bg-blue-100 text-blue-800" : "bg-red-100 text-red-800"
-  }`;
+  if (typeof data.chat_enabled !== "undefined") {
+    chatStatus.textContent = data.chat_enabled ? "활성화" : "비활성화";
+    chatStatus.className = `text-xs px-2 py-1 rounded-md ${
+      data.chat_enabled
+        ? "bg-blue-100 text-blue-800"
+        : "bg-red-100 text-red-800"
+    }`;
+  }
 
   const signupStatus = document.getElementById("signup-status");
-  signupStatus.textContent = data.can_signup_for_limited ? "가능" : "불가능";
-  signupStatus.className = `text-xs px-2 py-1 rounded-md ${
-    data.can_signup_for_limited
-      ? "bg-blue-100 text-blue-800"
-      : "bg-gray-100 text-gray-800"
-  }`;
+  if (typeof data.can_signup_for_limited !== "undefined") {
+    signupStatus.textContent = data.can_signup_for_limited ? "가능" : "불가능";
+    signupStatus.className = `text-xs px-2 py-1 rounded-md ${
+      data.can_signup_for_limited
+        ? "bg-blue-100 text-blue-800"
+        : "bg-gray-100 text-gray-800"
+    }`;
+  }
 
   // Analytics ID 표시
-  document.getElementById("analytics-id").textContent =
-    data.analytics_tracking_id;
+  if (data.analytics_tracking_id) {
+    document.getElementById("analytics-id").textContent =
+      data.analytics_tracking_id;
+  }
 }
 
 // 로딩 상태 설정
@@ -524,58 +544,85 @@ export function displayMultipleAccountsData(accountDataArray) {
     const otherQuotasContainer = document.getElementById("other-quotas");
     otherQuotasContainer.replaceChildren();
 
-    Object.entries(firstAccountData.quota_snapshots)
-      .filter(([key]) => key !== "premium_interactions")
-      .forEach(([key, quota]) => {
-        const quotaElement = createQuotaElement(quota);
-        otherQuotasContainer.appendChild(quotaElement);
-      });
+    if (firstAccountData.quota_snapshots) {
+      Object.entries(firstAccountData.quota_snapshots)
+        .filter(([key]) => key !== "premium_interactions")
+        .forEach(([key, quota]) => {
+          const quotaElement = createQuotaElement(quota);
+          otherQuotasContainer.appendChild(quotaElement);
+        });
+    }
 
     // 날짜 정보 표시 (첫 번째 계정 기준)
-    document.getElementById("assigned-date").textContent = formatDate(
-      firstAccountData.assigned_date
-    );
-    document.getElementById("reset-date").textContent = formatDate(
-      firstAccountData.quota_reset_date,
-      false
-    );
+    if (firstAccountData.assigned_date) {
+      document.getElementById("assigned-date").textContent = formatDate(
+        firstAccountData.assigned_date
+      );
+    }
+    if (firstAccountData.quota_reset_date) {
+      document.getElementById("reset-date").textContent = formatDate(
+        firstAccountData.quota_reset_date,
+        false
+      );
+    }
 
     // 계정 정보 표시 (첫 번째 계정 기준)
-    document.getElementById("account-type").textContent =
-      firstAccountData.access_type_sku.replace("_", " ").toUpperCase();
-    document.getElementById("plan-type").textContent =
-      firstAccountData.copilot_plan.toUpperCase();
+    if (firstAccountData.access_type_sku) {
+      document.getElementById("account-type").textContent =
+        firstAccountData.access_type_sku.replace("_", " ").toUpperCase();
+    }
+    if (firstAccountData.copilot_plan) {
+      document.getElementById("plan-type").textContent =
+        firstAccountData.copilot_plan.toUpperCase();
+    } else if (firstAccountData._noPlan) {
+      document.getElementById("plan-type").textContent = "플랜 없음";
+    }
 
     const chatStatus = document.getElementById("chat-status");
-    chatStatus.textContent = firstAccountData.chat_enabled
-      ? "활성화"
-      : "비활성화";
-    chatStatus.className = `text-xs px-2 py-1 rounded-md ${
-      firstAccountData.chat_enabled
-        ? "bg-blue-100 text-blue-800"
-        : "bg-red-100 text-red-800"
-    }`;
+    if (typeof firstAccountData.chat_enabled !== "undefined") {
+      chatStatus.textContent = firstAccountData.chat_enabled
+        ? "활성화"
+        : "비활성화";
+      chatStatus.className = `text-xs px-2 py-1 rounded-md ${
+        firstAccountData.chat_enabled
+          ? "bg-blue-100 text-blue-800"
+          : "bg-red-100 text-red-800"
+      }`;
+    }
 
     const signupStatus = document.getElementById("signup-status");
-    signupStatus.textContent = firstAccountData.can_signup_for_limited
-      ? "가능"
-      : "불가능";
-    signupStatus.className = `text-xs px-2 py-1 rounded-md ${
-      firstAccountData.can_signup_for_limited
-        ? "bg-blue-100 text-blue-800"
-        : "bg-gray-100 text-gray-800"
-    }`;
+    if (typeof firstAccountData.can_signup_for_limited !== "undefined") {
+      signupStatus.textContent = firstAccountData.can_signup_for_limited
+        ? "가능"
+        : "불가능";
+      signupStatus.className = `text-xs px-2 py-1 rounded-md ${
+        firstAccountData.can_signup_for_limited
+          ? "bg-blue-100 text-blue-800"
+          : "bg-gray-100 text-gray-800"
+      }`;
+    }
 
     // Analytics ID 표시 (첫 번째 계정)
-    document.getElementById("analytics-id").textContent =
-      firstAccountData.analytics_tracking_id;
+    if (firstAccountData.analytics_tracking_id) {
+      document.getElementById("analytics-id").textContent =
+        firstAccountData.analytics_tracking_id;
+    }
   }
 }
 
 // 단일 계정 Premium 카드 생성
 function generateSingleAccountPremiumCard({ accountIndex, data }) {
+  if (!data.quota_snapshots || !data.quota_snapshots.premium_interactions) {
+    return `
+      <div class="p-6">
+        <div class="text-center py-8">
+          <div class="text-yellow-600 text-lg font-semibold mb-2">⚠️ 플랜 없음</div>
+          <p class="text-gray-600">이 계정에는 활성화된 Copilot 플랜이 없습니다.</p>
+        </div>
+      </div>
+    `;
+  }
   const premium = data.quota_snapshots.premium_interactions;
-  if (!premium) return "";
 
   const usage = premium.entitlement - premium.remaining;
   const percentRemaining = premium.percent_remaining.toFixed(1);
@@ -633,51 +680,70 @@ function generateMultiAccountPremiumCard(accountDataArray) {
   let accountsHtml = "";
 
   accountDataArray.forEach(({ accountIndex, data }) => {
-    if (data.quota_snapshots.premium_interactions) {
-      const premium = data.quota_snapshots.premium_interactions;
-      totalRemaining += premium.remaining;
-      totalEntitlement += premium.entitlement;
-
-      const usage = premium.entitlement - premium.remaining;
-      const percentRemaining = premium.percent_remaining.toFixed(1);
-      const resetDate = formatDate(data.quota_reset_date, false);
-      const planType = data.copilot_plan.toUpperCase();
-
+    // 플랜이 없는 경우
+    if (!data.quota_snapshots || !data.quota_snapshots.premium_interactions) {
       accountsHtml += `
-        <div class="bg-white bg-opacity-70 rounded-lg p-4 border border-purple-200 hover:border-purple-300 transition-colors">
-          <div class="flex items-start justify-between mb-3">
+        <div class="bg-white bg-opacity-70 rounded-lg p-4 border border-yellow-200 hover:border-yellow-300 transition-colors">
+          <div class="flex items-center justify-between mb-3">
             <div>
-              <h4 class="font-semibold text-purple-900 text-lg">계정 #${accountIndex}</h4>
+              <h4 class="font-semibold text-gray-900 text-lg">계정 #${accountIndex}</h4>
               <div class="flex gap-2 mt-1">
-                <span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-md">${planType}</span>
-                <span class="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded-md">${percentRemaining}% 남음</span>
+                <span class="text-xs px-2 py-1 bg-yellow-100 text-yellow-700 rounded-md">⚠️ 플랜 없음</span>
               </div>
             </div>
-            <div class="text-right text-sm text-gray-600">
-              <div class="font-medium text-purple-800">리셋: ${resetDate}</div>
-            </div>
           </div>
-          <div class="flex items-center justify-between mb-2">
-            <div>
-              <div class="text-2xl font-bold text-purple-800">${
-                premium.remaining
-              } <span class="text-lg text-gray-500">/ ${
-        premium.entitlement
-      }</span></div>
-            </div>
-            <div class="text-right text-sm">
-              <div class="text-gray-600">사용: <span class="font-semibold text-purple-700">${usage}</span></div>
-              <div class="text-gray-500 text-xs mt-1">초과: ${
-                premium.overage_permitted ? "가능" : "불가"
-              }</div>
-            </div>
-          </div>
-          <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div class="h-full bg-gradient-to-r from-purple-500 to-indigo-600 transition-all duration-300" style="width: ${percentRemaining}%"></div>
+          <div class="text-center py-4">
+            <p class="text-gray-600 text-sm">이 계정에는 활성화된 Copilot 플랜이 없습니다.</p>
           </div>
         </div>
       `;
+      return; // 이 계정은 total에 포함하지 않음
     }
+
+    // 플랜이 있는 경우
+    const premium = data.quota_snapshots.premium_interactions;
+    totalRemaining += premium.remaining;
+    totalEntitlement += premium.entitlement;
+
+    const usage = premium.entitlement - premium.remaining;
+    const percentRemaining = premium.percent_remaining.toFixed(1);
+    const resetDate = formatDate(data.quota_reset_date, false);
+    const planType = data.copilot_plan.toUpperCase();
+
+    accountsHtml += `
+      <div class="bg-white bg-opacity-70 rounded-lg p-4 border border-purple-200 hover:border-purple-300 transition-colors">
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <h4 class="font-semibold text-purple-900 text-lg">계정 #${accountIndex}</h4>
+            <div class="flex gap-2 mt-1">
+              <span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-md">${planType}</span>
+              <span class="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded-md">${percentRemaining}% 남음</span>
+            </div>
+          </div>
+          <div class="text-right text-sm text-gray-600">
+            <div class="font-medium text-purple-800">리셋: ${resetDate}</div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <div class="text-2xl font-bold text-purple-800">${
+              premium.remaining
+            } <span class="text-lg text-gray-500">/ ${
+      premium.entitlement
+    }</span></div>
+          </div>
+          <div class="text-right text-sm">
+            <div class="text-gray-600">사용: <span class="font-semibold text-purple-700">${usage}</span></div>
+            <div class="text-gray-500 text-xs mt-1">초과: ${
+              premium.overage_permitted ? "가능" : "불가"
+            }</div>
+          </div>
+        </div>
+        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-purple-500 to-indigo-600 transition-all duration-300" style="width: ${percentRemaining}%"></div>
+        </div>
+      </div>
+    `;
   });
 
   const totalPercentRemaining =
