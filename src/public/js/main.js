@@ -15,7 +15,6 @@ import { fetchCopilotData, fetchCopilotModels } from "./api.js";
 // 전역 변수
 let apiData = null;
 let accountDataArray = []; // 다중 계정 데이터 저장
-let maxAccounts = 3; // 최대 계정 수
 
 // DOM 요소들
 const tokenInput = document.getElementById("token-input");
@@ -24,13 +23,13 @@ const generateTokenButton = document.getElementById("generate-token-button");
 const addAccountButton = document.getElementById("add-account-button");
 const saveTokenToggle = document.getElementById("save-token-toggle");
 const toggleTokenVisibility = document.getElementById(
-  "toggle-token-visibility"
+  "toggle-token-visibility",
 );
 const eyeIcon = document.getElementById("eye-icon");
 const eyeOffIcon = document.getElementById("eye-off-icon");
 const fetchModelsButton = document.getElementById("fetch-models-button");
 const additionalTokensContainer = document.getElementById(
-  "additional-tokens-container"
+  "additional-tokens-container",
 );
 
 // 페이지 로드 시 초기화
@@ -46,7 +45,7 @@ function setupEventListeners() {
   generateTokenButton.addEventListener("click", () => generateToken(0));
   addAccountButton.addEventListener("click", addAccountSlot);
   toggleTokenVisibility.addEventListener("click", () =>
-    togglePasswordVisibility(0)
+    togglePasswordVisibility(0),
   );
   fetchModelsButton?.addEventListener("click", fetchModels);
   tokenInput.addEventListener("keypress", function (e) {
@@ -68,7 +67,7 @@ function togglePasswordVisibility(index) {
   const toggleBtn = wrapper.querySelector(".toggle-visibility");
   const eyeIconEl = toggleBtn.querySelector("#eye-icon, [data-eye-icon]");
   const eyeOffIconEl = toggleBtn.querySelector(
-    "#eye-off-icon, [data-eye-off-icon]"
+    "#eye-off-icon, [data-eye-off-icon]",
   );
 
   if (tokenInputEl.type === "password") {
@@ -86,16 +85,9 @@ function togglePasswordVisibility(index) {
 function addAccountSlot() {
   const currentSlots = document.querySelectorAll(".token-input-wrapper").length;
 
-  if (currentSlots >= maxAccounts) {
-    showError(`최대 ${maxAccounts}개의 계정만 추가할 수 있습니다.`);
-    return;
-  }
-
   const newIndex = currentSlots;
   const newSlot = createAccountSlot(newIndex);
   additionalTokensContainer.appendChild(newSlot);
-
-  updateAddAccountButtonVisibility();
 }
 
 // 계정 슬롯 생성
@@ -205,7 +197,7 @@ function createAccountSlot(index) {
 // 계정 슬롯 제거
 function removeAccountSlot(index) {
   const wrapper = document.querySelector(
-    `.token-input-wrapper[data-index="${index}"]`
+    `.token-input-wrapper[data-index="${index}"]`,
   );
   if (wrapper && index !== 0) {
     wrapper.remove();
@@ -216,12 +208,8 @@ function removeAccountSlot(index) {
 
 // 계정 추가 버튼 표시/숨김 업데이트
 function updateAddAccountButtonVisibility() {
-  const currentSlots = document.querySelectorAll(".token-input-wrapper").length;
-  if (currentSlots >= maxAccounts) {
-    addAccountButton.style.display = "none";
-  } else {
-    addAccountButton.style.display = "inline-flex";
-  }
+  // 무제한 계정 추가 가능하므로 항상 버튼 표시
+  addAccountButton.style.display = "inline-flex";
 }
 
 // 저장된 토큰 로드
@@ -350,7 +338,7 @@ async function fetchAllApiDataWithTokens(tokens) {
       } else {
         console.error(
           `계정 #${index + 1} 데이터 가져오기 실패:`,
-          result.reason
+          result.reason,
         );
       }
     });
@@ -359,7 +347,7 @@ async function fetchAllApiDataWithTokens(tokens) {
       showError("모든 토큰에서 데이터를 가져오는데 실패했습니다.");
     } else if (accountDataArray.length < tokens.length) {
       showError(
-        `${tokens.length}개 중 ${accountDataArray.length}개 계정의 데이터만 가져왔습니다.`
+        `${tokens.length}개 중 ${accountDataArray.length}개 계정의 데이터만 가져왔습니다.`,
       );
     }
 
@@ -396,7 +384,7 @@ async function fetchApiDataWithToken(token) {
 // 토큰 자동 생성
 async function generateToken(index) {
   const generateBtn = document.querySelector(
-    `.generate-token-btn[data-index="${index}"]`
+    `.generate-token-btn[data-index="${index}"]`,
   );
   const tokenInputEl =
     index === 0
@@ -418,7 +406,7 @@ async function generateToken(index) {
     // Step 3: 자동 폴링으로 토큰 대기
     try {
       const token = await TokenGenerator.pollForToken(
-        deviceCodeData.device_code
+        deviceCodeData.device_code,
       );
 
       // 성공: 토큰 저장 및 입력
