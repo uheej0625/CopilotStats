@@ -1,10 +1,5 @@
-const SUPPORTED_LANGUAGES = ["ko", "en"];
-
 const messages = {
   ko: {
-    "language.label": "언어",
-    "language.ko": "한국어",
-    "language.en": "English",
     "app.subtitle": "GitHub Copilot 사용량 대시보드",
     "token.title": "API 토큰 입력",
     "token.description": "GitHub Copilot 토큰을 입력하세요",
@@ -100,9 +95,6 @@ const messages = {
     "multi.totalUsage": "총 사용량",
   },
   en: {
-    "language.label": "Language",
-    "language.ko": "한국어",
-    "language.en": "English",
     "app.subtitle": "GitHub Copilot usage dashboard",
     "token.title": "API token",
     "token.description": "Enter your GitHub Copilot token",
@@ -240,13 +232,6 @@ function applyStaticTranslations() {
   });
 
   document.documentElement.lang = currentLanguage;
-}
-
-export function setLanguage(lang) {
-  if (!SUPPORTED_LANGUAGES.includes(lang)) return;
-  currentLanguage = lang;
-  applyStaticTranslations();
-  window.dispatchEvent(new CustomEvent("languagechange", { detail: { lang } }));
 }
 
 export function initI18n() {
