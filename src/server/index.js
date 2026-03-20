@@ -68,7 +68,7 @@ app.get("/api/copilot/models", async (req, res) => {
     const token = req.headers.authorization;
 
     if (!token) {
-      return res.status(401).json({ error: "토큰이 필요합니다." });
+      return res.status(401).json({ error: "Token is required." });
     }
 
     const response = await fetch("https://api.githubcopilot.com/models", {

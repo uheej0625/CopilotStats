@@ -1,8 +1,10 @@
 // api.js - GitHub Copilot API 호출
 
+import { t } from "./i18n.js";
+
 export async function fetchCopilotData(token) {
   if (!token.trim()) {
-    throw new Error("토큰을 입력해주세요.");
+    throw new Error(t("api.enterToken"));
   }
 
   const response = await fetch("https://api.github.com/copilot_internal/user", {
@@ -15,12 +17,15 @@ export async function fetchCopilotData(token) {
 
   if (!response.ok) {
     if (response.status === 401) {
-      throw new Error("유효하지 않은 토큰입니다. 토큰을 확인해주세요.");
+      throw new Error(t("api.invalidToken"));
     } else if (response.status === 403) {
-      throw new Error("접근 권한이 없습니다. Copilot 구독을 확인해주세요.");
+      throw new Error(t("api.forbidden"));
     } else {
       throw new Error(
-        `API 호출 실패: ${response.status} ${response.statusText}`
+        t("api.failed", {
+          status: response.status,
+          statusText: response.statusText,
+        }),
       );
     }
   }
@@ -37,7 +42,7 @@ export async function fetchCopilotData(token) {
 
 export async function fetchCopilotModels(token) {
   if (!token.trim()) {
-    throw new Error("토큰을 입력해주세요.");
+    throw new Error(t("api.enterToken"));
   }
 
   const response = await fetch("/api/copilot/models", {
@@ -50,12 +55,15 @@ export async function fetchCopilotModels(token) {
 
   if (!response.ok) {
     if (response.status === 401) {
-      throw new Error("유효하지 않은 토큰입니다. 토큰을 확인해주세요.");
+      throw new Error(t("api.invalidToken"));
     } else if (response.status === 403) {
-      throw new Error("접근 권한이 없습니다. Copilot 구독을 확인해주세요.");
+      throw new Error(t("api.forbidden"));
     } else {
       throw new Error(
-        `API 호출 실패: ${response.status} ${response.statusText}`
+        t("api.failed", {
+          status: response.status,
+          statusText: response.statusText,
+        }),
       );
     }
   }

@@ -11,6 +11,7 @@ import {
 } from "./ui.js";
 import { TokenGenerator } from "./token-generator.js";
 import { fetchCopilotData, fetchCopilotModels } from "./api.js";
+import { initI18n, t } from "./i18n.js";
 
 // 전역 변수
 let apiData = null;
@@ -34,10 +35,20 @@ const additionalTokensContainer = document.getElementById(
 
 // 페이지 로드 시 초기화
 document.addEventListener("DOMContentLoaded", function () {
+  initI18n();
   loadSavedToken();
   setupEventListeners();
   updateAddAccountButtonVisibility();
+  applyDynamicLanguage();
+  window.addEventListener("languagechange", handleLanguageChange);
 });
+
+function handleLanguageChange() {
+  applyDynamicLanguage();
+  if (accountDataArray.length > 0) {
+    displayMultipleAccountsData(accountDataArray);
+  }
+}
 
 // 이벤트 리스너 설정
 function setupEventListeners() {
@@ -102,13 +113,13 @@ function createAccountSlot(index) {
         <input
           type="password"
           class="token-input w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          placeholder="계정 #${index + 1} - API 토큰을 입력하거나 생성하세요..."
+          placeholder="${t("token.placeholder", { index: index + 1 })}"
           data-index="${index}"
         />
         <button
           type="button"
           class="toggle-visibility absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
-          title="토큰 표시/숨기기"
+          title="${t("token.toggleVisibility")}"
           data-index="${index}"
         >
           <svg
@@ -149,7 +160,7 @@ function createAccountSlot(index) {
       </div>
       <button
         class="generate-token-btn px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
-        title="GitHub OAuth로 자동 생성"
+        title="${t("token.generateOauth")}"
         data-index="${index}"
       >
         <svg
@@ -168,7 +179,7 @@ function createAccountSlot(index) {
       </button>
       <button
         class="remove-account-btn px-3 py-2 bg-white text-red-600 border border-gray-300 rounded-md hover:bg-red-50 hover:border-red-300 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
-        title="계정 제거"
+        title="${t("account.remove")}"
         data-index="${index}"
       >
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -284,7 +295,7 @@ function fetchApiData() {
 async function fetchModels() {
   const token = tokenInput.value;
   if (!token.trim()) {
-    showError("토큰을 먼저 입력해주세요.");
+    showError(t("error.enterTokenFirst"));
     return;
   }
 
@@ -294,19 +305,19 @@ async function fetchModels() {
   try {
     button.disabled = true;
     button.innerHTML =
-      '<svg class="h-5 w-5 animate-spin inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 불러오는 중...';
+      `<svg class="h-5 w-5 animate-spin inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> ${t("loading.fetching")}`;
 
     const modelsData = await fetchCopilotModels(token);
     displayModels(modelsData);
 
-    button.innerHTML = "✓ 불러오기 완료";
+    button.innerHTML = t("loading.done");
     setTimeout(() => {
       button.innerHTML = originalText;
       button.disabled = false;
     }, 2000);
   } catch (error) {
     console.error("모델 정보 가져오기 실패:", error);
-    showError(error.message || "모델 정보를 가져오는데 실패했습니다.");
+    showError(error.message || t("error.fetchModelsFailed"));
     button.innerHTML = originalText;
     button.disabled = false;
   }
@@ -315,7 +326,7 @@ async function fetchModels() {
 // 토큰으로 API 데이터 가져오기 (다중)
 async function fetchAllApiDataWithTokens(tokens) {
   if (!tokens || tokens.length === 0) {
-    showError("최소 하나의 토큰을 입력해주세요.");
+    showError(t("error.enterAtLeastOneToken"));
     return;
   }
 
@@ -344,10 +355,13 @@ async function fetchAllApiDataWithTokens(tokens) {
     });
 
     if (accountDataArray.length === 0) {
-      showError("모든 토큰에서 데이터를 가져오는데 실패했습니다.");
+      showError(t("error.fetchAllFailed"));
     } else if (accountDataArray.length < tokens.length) {
       showError(
-        `${tokens.length}개 중 ${accountDataArray.length}개 계정의 데이터만 가져왔습니다.`,
+        t("error.partialFetch", {
+          count: tokens.length,
+          loaded: accountDataArray.length,
+        }),
       );
     }
 
@@ -359,7 +373,7 @@ async function fetchAllApiDataWithTokens(tokens) {
     setLoading(false);
   } catch (err) {
     console.error("API 호출 에러:", err);
-    showError(err.message || "데이터를 가져오는데 실패했습니다.");
+    showError(err.message || t("error.fetchDataFailed"));
     setLoading(false);
   }
 }
@@ -376,7 +390,7 @@ async function fetchApiDataWithToken(token) {
     setLoading(false);
   } catch (err) {
     console.error("API 호출 에러:", err);
-    showError(err.message || "데이터를 가져오는데 실패했습니다.");
+    showError(err.message || t("error.fetchDataFailed"));
     setLoading(false);
   }
 }
@@ -418,7 +432,7 @@ async function generateToken(index) {
       }
 
       modal.remove();
-      showSuccess(`계정 #${index + 1} 토큰이 성공적으로 생성되었습니다!`);
+      showSuccess(t("success.tokenCreated", { index: index + 1 }));
 
       // 단일 계정인 경우 자동으로 데이터 가져오기
       if (index === 0 && getAllTokens().length === 1) {
@@ -426,10 +440,10 @@ async function generateToken(index) {
       }
     } catch (error) {
       modal.remove();
-      showError(error.message || "토큰 생성에 실패했습니다.");
+      showError(error.message || t("error.createTokenFailed"));
     }
   } catch (error) {
-    showError(error.message || "토큰 생성에 실패했습니다.");
+    showError(error.message || t("error.createTokenFailed"));
   } finally {
     generateBtn.disabled = false;
     generateBtn.innerHTML =
@@ -446,9 +460,9 @@ function createAuthModal(deviceCodeData, accountIndex) {
   modal.innerHTML = `
     <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold text-gray-900">GitHub 인증 (계정 #${
-          accountIndex + 1
-        })</h3>
+        <h3 class="text-xl font-bold text-gray-900">${t("auth.github", {
+          index: accountIndex + 1,
+        })}</h3>
         <button class="close-modal text-gray-400 hover:text-gray-600">
           <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -459,38 +473,38 @@ function createAuthModal(deviceCodeData, accountIndex) {
       <div class="space-y-4">
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <p class="text-sm text-blue-800 mb-3">
-            <strong>1.</strong> 아래 링크를 클릭하여 GitHub로 이동하세요
+            <strong>1.</strong> ${t("auth.step1")}
           </p>
           <a href="${deviceCodeData.verification_uri}" target="_blank" 
              class="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-            GitHub 인증 페이지 열기
-          </a>
+             ${t("auth.openPage")}
+           </a>
         </div>
         
         <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
           <p class="text-sm text-gray-700 mb-2">
-            <strong>2.</strong> 다음 코드를 입력하세요
+            <strong>2.</strong> ${t("auth.step2")}
           </p>
           <div class="flex items-center justify-between bg-white border border-gray-300 rounded-md p-3">
             <code class="text-2xl font-mono font-bold tracking-wider">${
               deviceCodeData.user_code
             }</code>
             <button class="copy-code px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded text-sm transition-colors">
-              복사
+              ${t("auth.copy")}
             </button>
           </div>
         </div>
         
         <div class="bg-green-50 border border-green-200 rounded-lg p-4">
           <p class="text-sm text-green-800">
-            <strong>3.</strong> 인증을 완료하면 자동으로 토큰이 생성됩니다
+            <strong>3.</strong> ${t("auth.step3")}
           </p>
           <div class="mt-2 flex items-center justify-center space-x-2 text-green-600">
             <svg class="animate-spin h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <span class="text-sm">인증 대기 중...</span>
+            <span class="text-sm">${t("auth.waiting")}</span>
           </div>
         </div>
       </div>
@@ -507,7 +521,7 @@ function createAuthModal(deviceCodeData, accountIndex) {
     navigator.clipboard.writeText(deviceCodeData.user_code).then(() => {
       const btn = modal.querySelector(".copy-code");
       const originalText = btn.textContent;
-      btn.textContent = "✓ 복사됨";
+      btn.textContent = t("auth.copied");
       setTimeout(() => {
         btn.textContent = originalText;
       }, 2000);
@@ -524,6 +538,25 @@ function createAuthModal(deviceCodeData, accountIndex) {
   document.addEventListener("keydown", handleEscape);
 
   return modal;
+}
+
+function applyDynamicLanguage() {
+  document.querySelectorAll(".token-input").forEach((input) => {
+    const index = Number(input.dataset.index || "0") + 1;
+    input.placeholder = t("token.placeholder", { index });
+  });
+
+  document.querySelectorAll(".toggle-visibility").forEach((button) => {
+    button.title = t("token.toggleVisibility");
+  });
+
+  document.querySelectorAll(".generate-token-btn").forEach((button) => {
+    button.title = t("token.generateOauth");
+  });
+
+  document.querySelectorAll(".remove-account-btn").forEach((button) => {
+    button.title = t("account.remove");
+  });
 }
 
 // 성공 메시지 표시

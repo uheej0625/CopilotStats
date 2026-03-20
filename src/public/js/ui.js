@@ -1,4 +1,5 @@
 // ui.js - UI 렌더링 및 업데이트
+import { getLocale, t } from "./i18n.js";
 
 // 날짜 포맷팅
 function formatDate(dateString, includeTime = true) {
@@ -14,7 +15,7 @@ function formatDate(dateString, includeTime = true) {
     options.minute = "2-digit";
   }
 
-  return date.toLocaleDateString("ko-KR", options);
+  return date.toLocaleDateString(getLocale(), options);
 }
 
 // 할당량 색상 반환
@@ -86,7 +87,7 @@ function createQuotaElement(quota) {
     const unlimitedSpan = document.createElement("span");
     unlimitedSpan.className =
       "text-xs border border-gray-300 text-gray-700 px-2 py-1 rounded-md";
-    unlimitedSpan.textContent = "무제한";
+    unlimitedSpan.textContent = t("status.unlimited");
     left.appendChild(unlimitedSpan);
   }
 
@@ -97,7 +98,7 @@ function createQuotaElement(quota) {
   if (quota.unlimited) {
     const unlimitedText = document.createElement("span");
     unlimitedText.className = "text-sm text-green-600 font-medium";
-    unlimitedText.textContent = "무제한";
+    unlimitedText.textContent = t("status.unlimited");
     right.appendChild(unlimitedText);
   } else {
     const rightWrapper = document.createElement("div");
@@ -115,7 +116,9 @@ function createQuotaElement(quota) {
 
     const percentDiv = document.createElement("div");
     percentDiv.className = "text-xs text-gray-500";
-    percentDiv.textContent = `${quota.percent_remaining.toFixed(1)}% 남음`;
+    percentDiv.textContent = t("status.remaining", {
+      percent: quota.percent_remaining.toFixed(1),
+    });
     rightWrapper.appendChild(percentDiv);
   }
 
@@ -138,14 +141,16 @@ function createQuotaElement(quota) {
     bottom.appendChild(usageDiv);
 
     const usageSpan = document.createElement("span");
-    usageSpan.textContent = `사용량: ${quota.entitlement - quota.remaining}`;
+    usageSpan.textContent = t("status.usage", {
+      value: quota.entitlement - quota.remaining,
+    });
     usageDiv.appendChild(usageSpan);
 
     const overageSpan = document.createElement("span");
     overageSpan.className = "hidden sm:inline";
-    overageSpan.textContent = `초과 허용: ${
-      quota.overage_permitted ? "예" : "아니오"
-    }`;
+    overageSpan.textContent = t("status.overagePermitted", {
+      value: quota.overage_permitted ? t("status.yes") : t("status.no"),
+    });
     usageDiv.appendChild(overageSpan);
   }
 
@@ -168,13 +173,18 @@ export function displayData(data) {
     ).textContent = `${premium.remaining} / ${premium.entitlement}`;
     document.getElementById(
       "premium-percent"
-    ).textContent = `${premium.percent_remaining.toFixed(1)}% 남음`;
-    document.getElementById("premium-usage").textContent = `사용량: ${
-      premium.entitlement - premium.remaining
-    }`;
-    document.getElementById("premium-overage").textContent = `초과 허용: ${
-      premium.overage_permitted ? "예" : "아니오"
-    }`;
+    ).textContent = t("status.remaining", {
+      percent: premium.percent_remaining.toFixed(1),
+    });
+    document.getElementById("premium-usage").textContent = t("status.usage", {
+      value: premium.entitlement - premium.remaining,
+    });
+    document.getElementById("premium-overage").textContent = t(
+      "status.overagePermitted",
+      {
+        value: premium.overage_permitted ? t("status.yes") : t("status.no"),
+      }
+    );
     document.getElementById(
       "premium-progress"
     ).style.width = `${premium.percent_remaining}%`;
@@ -222,12 +232,14 @@ export function displayData(data) {
     document.getElementById("plan-type").textContent =
       data.copilot_plan.toUpperCase();
   } else if (data._noPlan) {
-    document.getElementById("plan-type").textContent = "플랜 없음";
+    document.getElementById("plan-type").textContent = t("plan.none");
   }
 
   const chatStatus = document.getElementById("chat-status");
   if (typeof data.chat_enabled !== "undefined") {
-    chatStatus.textContent = data.chat_enabled ? "활성화" : "비활성화";
+    chatStatus.textContent = data.chat_enabled
+      ? t("status.enabled")
+      : t("status.disabled");
     chatStatus.className = `text-xs px-2 py-1 rounded-md ${
       data.chat_enabled
         ? "bg-blue-100 text-blue-800"
@@ -237,7 +249,9 @@ export function displayData(data) {
 
   const signupStatus = document.getElementById("signup-status");
   if (typeof data.can_signup_for_limited !== "undefined") {
-    signupStatus.textContent = data.can_signup_for_limited ? "가능" : "불가능";
+    signupStatus.textContent = data.can_signup_for_limited
+      ? t("status.available")
+      : t("status.unavailable");
     signupStatus.className = `text-xs px-2 py-1 rounded-md ${
       data.can_signup_for_limited
         ? "bg-blue-100 text-blue-800"
@@ -259,11 +273,11 @@ export function setLoading(loading) {
   const fetchButton = document.getElementById("fetch-button");
 
   if (loading) {
-    buttonText.textContent = "로딩중...";
+    buttonText.textContent = t("loading");
     loadingIcon.classList.remove("hidden");
     fetchButton.disabled = true;
   } else {
-    buttonText.textContent = "데이터 가져오기";
+    buttonText.textContent = t("data.fetch");
     loadingIcon.classList.add("hidden");
     fetchButton.disabled = false;
   }
@@ -290,7 +304,7 @@ function copyPremiumCardHTML(premium) {
   const entitlement = premium.entitlement;
   const percentRemaining = premium.percent_remaining.toFixed(1);
   const usage = entitlement - remaining;
-  const overage = premium.overage_permitted ? "예" : "아니오";
+  const overage = premium.overage_permitted ? t("status.yes") : t("status.no");
 
   const html = `<div style="max-width: 800px; margin: 1em auto; padding: 2em; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; box-sizing: border-box; border-radius: 16px; background: linear-gradient(to right, #faf5ff, #eef2ff); border: 2px solid #e9d5ff; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);">
   <div style="margin-bottom: 1.5em;">
@@ -299,19 +313,19 @@ function copyPremiumCardHTML(premium) {
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
       </svg>
       <span style="font-size: 1.25em; font-weight: 600; color: #6b21a8;">Premium Interactions</span>
-      <span style="font-size: 0.875em; background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; padding: 0.25em 0.5em; border-radius: 0.375em;">핵심 할당량</span>
+      <span style="font-size: 0.875em; background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; padding: 0.25em 0.5em; border-radius: 0.375em;">${t("premium.coreQuota")}</span>
     </div>
-    <p style="margin: 0; color: #4b5563; font-size: 1em;">프리미엄 모델을 위한 할당량</p>
+    <p style="margin: 0; color: #4b5563; font-size: 1em;">${t("premium.description")}</p>
   </div>
   <div style="margin-bottom: 1.5em;">
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1em;">
       <div>
         <div style="font-size: 1.875em; font-weight: 700; color: #7e22ce; margin-bottom: 0.25em;">${remaining} / ${entitlement}</div>
-        <div style="font-size: 1.125em; color: #9333ea;">${percentRemaining}% 남음</div>
+        <div style="font-size: 1.125em; color: #9333ea;">${t("status.remaining", { percent: percentRemaining })}</div>
       </div>
       <div style="text-align: right;">
-        <div style="font-size: 1.125em; font-weight: 500; color: #374151; margin-bottom: 0.5em;">사용량: ${usage}</div>
-        <div style="font-size: 0.875em; color: #6b7280;">초과 허용: ${overage}</div>
+        <div style="font-size: 1.125em; font-weight: 500; color: #374151; margin-bottom: 0.5em;">${t("status.usage", { value: usage })}</div>
+        <div style="font-size: 0.875em; color: #6b7280;">${t("status.overagePermitted", { value: overage })}</div>
       </div>
     </div>
     <div style="height: 1em; background: #e5e7eb; border-radius: 9999px; overflow: hidden;">
@@ -323,11 +337,11 @@ function copyPremiumCardHTML(premium) {
   navigator.clipboard
     .writeText(html)
     .then(() => {
-      showSuccessMessage("HTML이 복사되었습니다.");
+      showSuccessMessage(t("copy.success"));
     })
     .catch((err) => {
       console.error("복사 실패:", err);
-      showError("복사에 실패했습니다.");
+      showError(t("copy.failed"));
     });
 }
 
@@ -360,14 +374,22 @@ function createModelCard(model) {
 
   // 카테고리별 색상 및 아이콘
   const categoryStyles = {
-    lightweight: { color: "blue", icon: "⚡", label: "경량" },
-    versatile: { color: "purple", icon: "🎯", label: "범용" },
-    powerful: { color: "red", icon: "🚀", label: "강력" },
+    lightweight: {
+      color: "blue",
+      icon: "⚡",
+      label: t("model.category.lightweight"),
+    },
+    versatile: {
+      color: "purple",
+      icon: "🎯",
+      label: t("model.category.versatile"),
+    },
+    powerful: { color: "red", icon: "🚀", label: t("model.category.powerful") },
   };
 
   const category = model.model_picker_category
     ? categoryStyles[model.model_picker_category]
-    : { color: "gray", icon: "🤖", label: "기타" };
+    : { color: "gray", icon: "🤖", label: t("model.category.other") };
 
   const borderColor = `border-${category.color}-200`;
   const bgColor = `bg-${category.color}-50`;
@@ -390,20 +412,22 @@ function createModelCard(model) {
         ${
           model.model_picker_enabled
             ? `<span class="flex-shrink-0 text-xs ${badgeBg} ${badgeText} px-2 py-1 rounded-md font-medium">${category.label}</span>`
-            : '<span class="flex-shrink-0 text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md">비활성</span>'
+            : `<span class="flex-shrink-0 text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md">${t(
+                "model.inactive",
+              )}</span>`
         }
       </div>
 
       <div class="space-y-2 text-xs">
         <div class="flex items-center justify-between py-1 border-b border-gray-100">
-          <span class="text-gray-600">제공사</span>
+          <span class="text-gray-600">${t("model.vendor")}</span>
           <span class="font-medium text-gray-900">${model.vendor}</span>
         </div>
         ${
           model.capabilities
             ? `
           <div class="flex items-center justify-between py-1 border-b border-gray-100">
-            <span class="text-gray-600">타입</span>
+            <span class="text-gray-600">${t("model.type")}</span>
             <span class="font-medium text-gray-900">${
               model.capabilities.type || "N/A"
             }</span>
@@ -412,7 +436,7 @@ function createModelCard(model) {
             model.capabilities.limits?.max_context_window_tokens
               ? `
             <div class="flex items-center justify-between py-1 border-b border-gray-100">
-              <span class="text-gray-600">컨텍스트</span>
+              <span class="text-gray-600">${t("model.context")}</span>
               <span class="font-medium text-gray-900">${(
                 model.capabilities.limits.max_context_window_tokens / 1000
               ).toFixed(0)}K</span>
@@ -424,7 +448,7 @@ function createModelCard(model) {
             model.capabilities.limits?.max_output_tokens
               ? `
             <div class="flex items-center justify-between py-1 border-b border-gray-100">
-              <span class="text-gray-600">최대 출력</span>
+              <span class="text-gray-600">${t("model.maxOutput")}</span>
               <span class="font-medium text-gray-900">${(
                 model.capabilities.limits.max_output_tokens / 1000
               ).toFixed(0)}K</span>
@@ -498,8 +522,9 @@ export function displayModels(modelsData) {
   });
 
   if (sortedModels.length === 0) {
-    modelsGrid.innerHTML =
-      '<p class="text-sm text-gray-500 py-4">사용 가능한 모델이 없습니다.</p>';
+    modelsGrid.innerHTML = `<p class="text-sm text-gray-500 py-4">${t(
+      "model.none",
+    )}</p>`;
     return;
   }
 
@@ -575,14 +600,14 @@ export function displayMultipleAccountsData(accountDataArray) {
       document.getElementById("plan-type").textContent =
         firstAccountData.copilot_plan.toUpperCase();
     } else if (firstAccountData._noPlan) {
-      document.getElementById("plan-type").textContent = "플랜 없음";
+      document.getElementById("plan-type").textContent = t("plan.none");
     }
 
     const chatStatus = document.getElementById("chat-status");
     if (typeof firstAccountData.chat_enabled !== "undefined") {
       chatStatus.textContent = firstAccountData.chat_enabled
-        ? "활성화"
-        : "비활성화";
+        ? t("status.enabled")
+        : t("status.disabled");
       chatStatus.className = `text-xs px-2 py-1 rounded-md ${
         firstAccountData.chat_enabled
           ? "bg-blue-100 text-blue-800"
@@ -593,8 +618,8 @@ export function displayMultipleAccountsData(accountDataArray) {
     const signupStatus = document.getElementById("signup-status");
     if (typeof firstAccountData.can_signup_for_limited !== "undefined") {
       signupStatus.textContent = firstAccountData.can_signup_for_limited
-        ? "가능"
-        : "불가능";
+        ? t("status.available")
+        : t("status.unavailable");
       signupStatus.className = `text-xs px-2 py-1 rounded-md ${
         firstAccountData.can_signup_for_limited
           ? "bg-blue-100 text-blue-800"
@@ -616,8 +641,8 @@ function generateSingleAccountPremiumCard({ accountIndex, data }) {
     return `
       <div class="p-6">
         <div class="text-center py-8">
-          <div class="text-yellow-600 text-lg font-semibold mb-2">⚠️ 플랜 없음</div>
-          <p class="text-gray-600">이 계정에는 활성화된 Copilot 플랜이 없습니다.</p>
+          <div class="text-yellow-600 text-lg font-semibold mb-2">⚠️ ${t("multi.noPlan")}</div>
+          <p class="text-gray-600">${t("multi.noPlanDesc")}</p>
         </div>
       </div>
     `;
@@ -636,14 +661,14 @@ function generateSingleAccountPremiumCard({ accountIndex, data }) {
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
             </svg>
             <span class="text-purple-800">Premium Interactions</span>
-            <span class="text-sm bg-purple-100 text-purple-700 border border-purple-300 px-2 py-1 rounded-md">핵심 할당량</span>
+            <span class="text-sm bg-purple-100 text-purple-700 border border-purple-300 px-2 py-1 rounded-md">${t("premium.coreQuota")}</span>
           </h3>
-          <p class="text-base text-gray-600 mt-1">프리미엄 모델을 위한 할당량</p>
+          <p class="text-base text-gray-600 mt-1">${t("premium.description")}</p>
         </div>
         <button
           id="share-premium-button"
           class="ml-4 p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-100 rounded-md transition-colors"
-          title="HTML 복사"
+          title="${t("premium.copyHtml")}"
         >
           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
@@ -657,13 +682,16 @@ function generateSingleAccountPremiumCard({ accountIndex, data }) {
           <div id="premium-quota" class="text-3xl font-bold text-purple-800">${
             premium.remaining
           } / ${premium.entitlement}</div>
-          <div id="premium-percent" class="text-lg text-purple-600 mt-1">${percentRemaining}% 남음</div>
+          <div id="premium-percent" class="text-lg text-purple-600 mt-1">${t("status.remaining", { percent: percentRemaining })}</div>
         </div>
         <div class="text-right">
-          <div id="premium-usage" class="text-lg font-semibold text-gray-700">사용량: ${usage}</div>
-          <div id="premium-overage" class="text-sm text-gray-600 mt-1">초과 허용: ${
-            premium.overage_permitted ? "예" : "아니오"
-          }</div>
+          <div id="premium-usage" class="text-lg font-semibold text-gray-700">${t("status.usage", { value: usage })}</div>
+          <div id="premium-overage" class="text-sm text-gray-600 mt-1">${t(
+            "status.overagePermitted",
+            {
+              value: premium.overage_permitted ? t("status.yes") : t("status.no"),
+            },
+          )}</div>
         </div>
       </div>
       <div class="progress-bar h-3">
@@ -686,14 +714,18 @@ function generateMultiAccountPremiumCard(accountDataArray) {
         <div class="bg-white bg-opacity-70 rounded-lg p-4 border border-yellow-200 hover:border-yellow-300 transition-colors">
           <div class="flex items-center justify-between mb-3">
             <div>
-              <h4 class="font-semibold text-gray-900 text-lg">계정 #${accountIndex}</h4>
+              <h4 class="font-semibold text-gray-900 text-lg">${t("multi.account", {
+                index: accountIndex,
+              })}</h4>
               <div class="flex gap-2 mt-1">
-                <span class="text-xs px-2 py-1 bg-yellow-100 text-yellow-700 rounded-md">⚠️ 플랜 없음</span>
+                <span class="text-xs px-2 py-1 bg-yellow-100 text-yellow-700 rounded-md">⚠️ ${t(
+                  "multi.noPlan",
+                )}</span>
               </div>
             </div>
           </div>
           <div class="text-center py-4">
-            <p class="text-gray-600 text-sm">이 계정에는 활성화된 Copilot 플랜이 없습니다.</p>
+            <p class="text-gray-600 text-sm">${t("multi.noPlanDesc")}</p>
           </div>
         </div>
       `;
@@ -714,14 +746,20 @@ function generateMultiAccountPremiumCard(accountDataArray) {
       <div class="bg-white bg-opacity-70 rounded-lg p-4 border border-purple-200 hover:border-purple-300 transition-colors">
         <div class="flex items-start justify-between mb-3">
           <div>
-            <h4 class="font-semibold text-purple-900 text-lg">계정 #${accountIndex}</h4>
+             <h4 class="font-semibold text-purple-900 text-lg">${t("multi.account", {
+               index: accountIndex,
+             })}</h4>
             <div class="flex gap-2 mt-1">
               <span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-md">${planType}</span>
-              <span class="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded-md">${percentRemaining}% 남음</span>
+              <span class="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded-md">${t("status.remaining", {
+                percent: percentRemaining,
+              })}</span>
             </div>
           </div>
           <div class="text-right text-sm text-gray-600">
-            <div class="font-medium text-purple-800">리셋: ${resetDate}</div>
+            <div class="font-medium text-purple-800">${t("multi.reset", {
+              date: resetDate,
+            })}</div>
           </div>
         </div>
         <div class="flex items-center justify-between mb-2">
@@ -733,9 +771,9 @@ function generateMultiAccountPremiumCard(accountDataArray) {
     }</span></div>
           </div>
           <div class="text-right text-sm">
-            <div class="text-gray-600">사용: <span class="font-semibold text-purple-700">${usage}</span></div>
-            <div class="text-gray-500 text-xs mt-1">초과: ${
-              premium.overage_permitted ? "가능" : "불가"
+            <div class="text-gray-600">${t("multi.used")}<span class="font-semibold text-purple-700">${usage}</span></div>
+            <div class="text-gray-500 text-xs mt-1">${t("multi.overage")}${
+              premium.overage_permitted ? t("multi.overageYes") : t("multi.overageNo")
             }</div>
           </div>
         </div>
@@ -761,9 +799,12 @@ function generateMultiAccountPremiumCard(accountDataArray) {
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
             </svg>
             <span class="text-purple-800">Premium Interactions</span>
-            <span class="text-sm bg-purple-100 text-purple-700 border border-purple-300 px-2 py-1 rounded-md">전체 ${accountDataArray.length}개 계정</span>
+            <span class="text-sm bg-purple-100 text-purple-700 border border-purple-300 px-2 py-1 rounded-md">${t(
+              "multi.totalAccounts",
+              { count: accountDataArray.length },
+            )}</span>
           </h3>
-          <p class="text-base text-gray-600 mt-1">프리미엄 모델을 위한 할당량</p>
+          <p class="text-base text-gray-600 mt-1">${t("premium.description")}</p>
         </div>
       </div>
     </div>
@@ -771,12 +812,12 @@ function generateMultiAccountPremiumCard(accountDataArray) {
       <div class="mb-4 p-5 bg-gradient-to-br from-purple-100 via-purple-50 to-indigo-100 rounded-lg border-2 border-purple-300 shadow-sm">
         <div class="flex items-center justify-between mb-3">
           <div>
-            <div class="text-sm text-purple-700 font-medium mb-1">🎯 전체 합계</div>
+            <div class="text-sm text-purple-700 font-medium mb-1">${t("multi.total")}</div>
             <div class="text-3xl font-bold text-purple-900">${totalRemaining} <span class="text-xl text-gray-600">/ ${totalEntitlement}</span></div>
-            <div class="text-lg text-purple-700 mt-1 font-semibold">${totalPercentRemaining}% 남음</div>
+            <div class="text-lg text-purple-700 mt-1 font-semibold">${t("status.remaining", { percent: totalPercentRemaining })}</div>
           </div>
           <div class="text-right">
-            <div class="text-sm font-medium text-gray-600">총 사용량</div>
+            <div class="text-sm font-medium text-gray-600">${t("multi.totalUsage")}</div>
             <div class="text-3xl font-bold text-purple-800">${totalUsage}</div>
           </div>
         </div>
