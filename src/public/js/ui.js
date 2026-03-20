@@ -746,9 +746,9 @@ function generateMultiAccountPremiumCard(accountDataArray) {
       <div class="bg-white bg-opacity-70 rounded-lg p-4 border border-purple-200 hover:border-purple-300 transition-colors">
         <div class="flex items-start justify-between mb-3">
           <div>
-             <h4 class="font-semibold text-purple-900 text-lg">${t("multi.account", {
-               index: accountIndex,
-             })}</h4>
+            <h4 class="font-semibold text-purple-900 text-lg">${t("multi.account", {
+              index: accountIndex,
+            })}</h4>
             <div class="flex gap-2 mt-1">
               <span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-md">${planType}</span>
               <span class="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded-md">${t("status.remaining", {

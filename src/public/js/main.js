@@ -477,8 +477,8 @@ function createAuthModal(deviceCodeData, accountIndex) {
           </p>
           <a href="${deviceCodeData.verification_uri}" target="_blank" 
              class="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-             ${t("auth.openPage")}
-           </a>
+            ${t("auth.openPage")}
+          </a>
         </div>
         
         <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">

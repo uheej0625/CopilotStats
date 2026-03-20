@@ -217,8 +217,9 @@ export function getLocale() {
 }
 
 export function t(key, variables = {}) {
-  const template =
-    messages[currentLanguage]?.[key] ?? messages.ko[key] ?? messages.en[key] ?? key;
+  const currentMessages = messages[currentLanguage] ?? messages.ko;
+  const fallbackMessages = currentLanguage === "ko" ? messages.en : messages.ko;
+  const template = currentMessages[key] ?? fallbackMessages[key] ?? key;
   return Object.entries(variables).reduce(
     (result, [k, value]) => result.replaceAll(`{${k}}`, String(value)),
     template,
