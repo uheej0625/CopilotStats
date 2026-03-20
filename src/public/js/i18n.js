@@ -1,4 +1,3 @@
-const STORAGE_KEY = "copilotstats-language";
 const SUPPORTED_LANGUAGES = ["ko", "en"];
 
 const messages = {
@@ -201,9 +200,8 @@ const messages = {
 };
 
 function detectLanguage() {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (SUPPORTED_LANGUAGES.includes(stored)) return stored;
-  return navigator.language?.toLowerCase().startsWith("ko") ? "ko" : "en";
+  const language = navigator.language?.toLowerCase() || "en";
+  return language.startsWith("ko") ? "ko" : "en";
 }
 
 let currentLanguage = detectLanguage();
@@ -241,29 +239,16 @@ function applyStaticTranslations() {
     el.title = t(el.dataset.i18nTitle);
   });
 
-  const languageSelect = document.getElementById("language-select");
-  if (languageSelect) {
-    languageSelect.value = currentLanguage;
-  }
-
   document.documentElement.lang = currentLanguage;
 }
 
 export function setLanguage(lang) {
   if (!SUPPORTED_LANGUAGES.includes(lang)) return;
   currentLanguage = lang;
-  localStorage.setItem(STORAGE_KEY, lang);
   applyStaticTranslations();
   window.dispatchEvent(new CustomEvent("languagechange", { detail: { lang } }));
 }
 
 export function initI18n() {
   applyStaticTranslations();
-  const languageSelect = document.getElementById("language-select");
-  if (languageSelect && !languageSelect.dataset.initialized) {
-    languageSelect.dataset.initialized = "true";
-    languageSelect.addEventListener("change", (event) => {
-      setLanguage(event.target.value);
-    });
-  }
 }
