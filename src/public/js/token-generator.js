@@ -1,5 +1,7 @@
 // token-generator.js - GitHub OAuth Device Flow를 통한 토큰 생성
 
+import { t } from "./i18n.js";
+
 export const TokenGenerator = {
   // Step 1: Device Code 요청 (서버 프록시 경유)
   async getDeviceCode() {
@@ -11,7 +13,9 @@ export const TokenGenerator = {
     });
 
     if (!response.ok) {
-      throw new Error(`디바이스 코드 요청 실패: ${response.status}`);
+      throw new Error(
+        t("oauth.deviceCodeFailed", { status: response.status }),
+      );
     }
 
     return await response.json();
@@ -30,7 +34,9 @@ export const TokenGenerator = {
     });
 
     if (!response.ok) {
-      throw new Error(`액세스 토큰 요청 실패: ${response.status}`);
+      throw new Error(
+        t("oauth.accessTokenFailed", { status: response.status }),
+      );
     }
 
     const data = await response.json();
@@ -44,11 +50,11 @@ export const TokenGenerator = {
     }
 
     if (data.error) {
-      throw new Error(`토큰 요청 실패: ${data.error}`);
+      throw new Error(t("oauth.tokenRequestFailed", { error: data.error }));
     }
 
     if (!data.access_token) {
-      throw new Error("액세스 토큰을 찾을 수 없습니다");
+      throw new Error(t("oauth.noAccessToken"));
     }
 
     return data.access_token;
@@ -69,7 +75,7 @@ export const TokenGenerator = {
             if (Date.now() - startTime < timeout) {
               setTimeout(poll, interval);
             } else {
-              reject(new Error("인증 시간이 초과되었습니다"));
+              reject(new Error(t("oauth.timeout")));
             }
           } else if (error.message === "SLOW_DOWN") {
             // 너무 빠르게 요청함
