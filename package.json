@@ -9,6 +9,7 @@
     "dev": "node src/server/index.js"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "express": "^4.18.2"
   },
   "author": "",
