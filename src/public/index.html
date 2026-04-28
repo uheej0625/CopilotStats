@@ -6,10 +6,10 @@
     <title>CopilotStats</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/css/styles.css" />
-    <script type="module">
-      import { inject } from 'https://cdn.jsdelivr.net/npm/@vercel/analytics@1/dist/index.js';
-      inject();
+    <script>
+      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
     </script>
+    <script defer src="/_vercel/insights/script.js"></script>
   </head>
 
   <body class="min-h-screen bg-gray-50">
