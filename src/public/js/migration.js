@@ -48,7 +48,7 @@ function showMigrationModal(tokens) {
   description.className = "text-gray-700 leading-relaxed mb-4";
   description.innerHTML = `
     현재 접속 중인 <strong>copilotstats.com</strong> 도메인은 곧 사용 기간이 만료되어 접속이 중단될 예정입니다.<br/><br/>
-    새로운 주소인 <a href="https://copilotstats.vercel.com" class="text-blue-600 underline font-semibold">copilotstats.vercel.com</a> 로 이동하여 서비스를 계속 이용하실 수 있습니다.<br/><br/>
+    새로운 주소인 <a href="https://copilotstats.vercel.app" class="text-blue-600 underline font-semibold">copilotstats.vercel.app</a> 로 이동하여 서비스를 계속 이용하실 수 있습니다.<br/><br/>
     <span class="bg-red-50 text-red-600 px-2 py-1 rounded text-sm font-semibold inline-block mb-2">보안 주의</span><br/>
     보안을 위해 이 확인 메세지를 닫거나 동의하시면, 현재 브라우저에 저장된 <strong>모든 토큰 데이터는 즉시 삭제</strong>됩니다. 아래에서 기존 토큰을 확인하고 복사할 수 있습니다.
   `;
@@ -131,7 +131,7 @@ function showMigrationModal(tokens) {
     localStorage.clear(); // 전체 초기화 (혹시 다른 잔여 데이터도 삭제)
 
     // 리다이렉트
-    window.location.href = "https://copilotstats.vercel.com/";
+    window.location.href = "https://copilotstats.vercel.app/";
   };
 
   const closeBtn = document.createElement("button");
