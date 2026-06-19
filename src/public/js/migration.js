@@ -42,13 +42,13 @@ function showMigrationModal(tokens) {
   // 안내 텍스트
   const title = document.createElement("h2");
   title.className = "text-2xl font-bold text-red-600 mb-4";
-  title.innerText = "⚠️ 서비스 도메인 이전 안내";
+  title.innerText = "당장 내일(6월 20일) 이 도메인이 만료됩니다.";
 
   const description = document.createElement("p");
   description.className = "text-gray-700 leading-relaxed mb-4";
   description.innerHTML = `
     현재 접속 중인 <strong>copilotstats.com</strong> 도메인은 곧 사용 기간이 만료되어 접속이 중단될 예정입니다.<br/><br/>
-    새로운 주소인 <a href="https://copilotstats.vercel.app" class="text-blue-600 underline font-semibold">copilotstats.vercel.app</a> 로 이동하여 서비스를 계속 이용하실 수 있습니다.<br/><br/>
+    새로운 주소인 <a href="https://copilotstats.vercel.app" class="text-blue-600 underline font-semibold">copilotstats.vercel.app</a> 로 이동하여 서비스를 계속 이용하실 수 있습니다. 북마크하여 사용중인 경우 경로를 재지정 하세요.<br/><br/>
     <span class="bg-red-50 text-red-600 px-2 py-1 rounded text-sm font-semibold inline-block mb-2">보안 주의</span><br/>
     보안을 위해 이 확인 메세지를 닫거나 동의하시면, 현재 브라우저에 저장된 <strong>모든 토큰 데이터는 즉시 삭제</strong>됩니다. 아래에서 기존 토큰을 확인하고 복사할 수 있습니다.
   `;
